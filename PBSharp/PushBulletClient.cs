@@ -19,7 +19,7 @@ namespace PBSharp
         public static async Task<PushBulletClient> CreateClientAsync(string accessToken)
         {
             var requests = new Requests(accessToken);
-            var authentication = await requests.SendRequestAsync<AuthenticationModel>("/v2/users/me").ConfigureAwait(false);
+            var authentication = await requests.GetRequestAsync<AuthenticationModel>("/v2/users/me").ConfigureAwait(false);
 
             return new PushBulletClient(requests, authentication);
         }

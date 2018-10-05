@@ -24,7 +24,7 @@ namespace PBSharp
             _serializer = new JsonSerializer();
         }
 
-        public async Task<T> SendRequestAsync<T>(string endpoint)
+        public async Task<T> GetRequestAsync<T>(string endpoint)
         {
             using (var post = await _client.GetAsync(endpoint).ConfigureAwait(false))
             {
