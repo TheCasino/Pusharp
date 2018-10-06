@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Voltaic.Serialization.Json;
 
-namespace PBSharp
+namespace Pusharp
 {
     internal class Requests
     {
@@ -15,7 +15,7 @@ namespace PBSharp
         {
             _client = new HttpClient
             {
-                BaseAddress = new Uri(@"https://api.pushbullet.com")
+                BaseAddress = new Uri("https://api.pushbullet.com")
             };
 
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

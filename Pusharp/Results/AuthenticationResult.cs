@@ -1,7 +1,7 @@
 ﻿using System;
-using Model = PBSharp.Models.AuthenticationModel;
+using Model = Pusharp.Models.AuthenticationModel;
 
-namespace PBSharp.Results
+namespace Pusharp.Results
 {
     public class AuthenticationResult
     {
@@ -19,8 +19,8 @@ namespace PBSharp.Results
 
         public Uri ImageUrl => new Uri(_model.ImageUrl);
 
-        public DateTimeOffset Created => DateTimeOffset.FromUnixTimeMilliseconds((long)_model.Created);
-        public DateTimeOffset Modified => DateTimeOffset.FromUnixTimeMilliseconds((long)_model.Modified);
+        public DateTimeOffset Created => _model.Created.ToDateTime();
+        public DateTimeOffset Modified => _model.Created.ToDateTime();
 
         internal AuthenticationResult(Model model)
         {

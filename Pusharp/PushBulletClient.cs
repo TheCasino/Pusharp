@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
-using PBSharp.Models;
-using PBSharp.Results;
+﻿using Pusharp.Models;
+using Pusharp.Results;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace PBSharp
+namespace Pusharp
 {
     public class PushBulletClient
     {
@@ -22,6 +23,12 @@ namespace PBSharp
             var authentication = await requests.GetRequestAsync<AuthenticationModel>("/v2/users/me").ConfigureAwait(false);
 
             return new PushBulletClient(requests, authentication);
+        }
+
+        public async Task<IEnumerable<Device>> GetDevicesAsync()
+        {
+            var devicesModel = await _requests.GetRequestAsync<DevicesModel>("/v2/devices");
+            return devicesModel.Models.ToDevices();
         }
     }
 }

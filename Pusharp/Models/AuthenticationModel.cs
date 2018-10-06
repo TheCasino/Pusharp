@@ -1,6 +1,6 @@
 ﻿using Voltaic.Serialization;
 
-namespace PBSharp.Models
+namespace Pusharp.Models
 {
     internal class AuthenticationModel
     {
