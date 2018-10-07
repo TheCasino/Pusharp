@@ -1,6 +1,5 @@
 ﻿using Pusharp.RequestParameters;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -18,22 +17,25 @@ namespace Pusharp
         private readonly HttpClient _client;
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _semaphore;
-        private readonly PushBulletClientConfig _config;
 
-        public const string RatelimitLimitHeaderName = "X-Ratelimit-Limit";
-        public const string RatelimitRemainingHeaderName = "X-Ratelimit-Remaining";
-        public const string RatelimitResetHeaderName = "X-Ratelimit-Reset";
+        private const string RatelimitLimitHeaderName = "X-Ratelimit-Limit";
+        private const string RatelimitRemainingHeaderName = "X-Ratelimit-Remaining";
+        private const string RatelimitResetHeaderName = "X-Ratelimit-Reset";
 
-        private int _ratelimitLimit;
-        private int _ratelimitRemaining;
-        private DateTimeOffset _ratelimitReset;
+        private string _rateLimit;
+        private string _rateLimitReset;
+        private string _remaining = "1";
 
+        private int RateLimit => int.TryParse(_rateLimit, out var value) ? value : 0;
+        private int Remaining => int.TryParse(_remaining, out var amount) ? amount : 0;
+
+        private DateTimeOffset RateLimitReset => DateTimeOffset.FromUnixTimeSeconds(long.TryParse(_rateLimitReset, out var seconds) ? seconds : 0);
+        
         public Requests(string accessToken, PushBulletClientConfig config)
         {
-            _config = config;
             _client = new HttpClient
             {
-                BaseAddress = new Uri(_config.ApiBaseUrl)
+                BaseAddress = new Uri(config.ApiBaseUrl)
             };
 
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -43,9 +45,18 @@ namespace Pusharp
             _semaphore = new SemaphoreSlim(1, 1);
         }
 
-        public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, BaseRequest parameters = null)
+        public Task<T> SendAsync<T>(string endpoint)
+            => SendAsync<T>(endpoint, HttpMethod.Get, false, 0, null);
+
+        public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, bool isDatabaseRequest, int hits, BaseRequest parameters)
         {
             await _semaphore.WaitAsync().ConfigureAwait(false);
+
+            if(CalculateCost(isDatabaseRequest, hits) > Remaining)
+            {
+                _semaphore.Release();
+                throw new Exception("pre-emptive ratelimit :(");
+            }
 
             var request = new HttpRequestMessage(method, endpoint);
             parameters = parameters ?? EmptyParameters.Create();
@@ -62,22 +73,21 @@ namespace Pusharp
             }
         }
 
+        private static int CalculateCost(bool isDatabaseRequest, int hits = 0)
+            => 1 + (isDatabaseRequest ? 4 : 0) * hits;
+
         private void ParseResponseHeaders(HttpResponseMessage message)
         {
-            if (message.Headers.Contains(RatelimitLimitHeaderName))
-            {
-                _ratelimitLimit = int.Parse(message.Headers.GetValues(RatelimitLimitHeaderName).FirstOrDefault() ?? throw new ArgumentNullException(RatelimitLimitHeaderName));
-            }
+            var headers = message.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault(),
+                StringComparer.OrdinalIgnoreCase);
 
-            if (message.Headers.Contains(RatelimitRemainingHeaderName))
-            {
-                _ratelimitRemaining = int.Parse(message.Headers.GetValues(RatelimitRemainingHeaderName).FirstOrDefault() ?? throw new ArgumentNullException(RatelimitRemainingHeaderName));
-            }
+            headers.TryGetValue(RatelimitLimitHeaderName, out _rateLimit);
+            headers.TryGetValue(RatelimitResetHeaderName, out _rateLimitReset);
+            headers.TryGetValue(RatelimitRemainingHeaderName, out _remaining);
 
-            if (message.Headers.Contains(RatelimitResetHeaderName))
-            {
-                _ratelimitReset = DateTimeOffset.FromUnixTimeSeconds(long.Parse(message.Headers.GetValues(RatelimitResetHeaderName).FirstOrDefault() ?? throw new ArgumentNullException(RatelimitResetHeaderName)));
-            }
+            Console.WriteLine($"Ratelimit: {RateLimit}\n" +
+                              $"Remaining: {Remaining}\n" +
+                              $"Reset: {RateLimitReset}");
         }
 
         private async Task<T> HandleResponseAsync<T>(HttpResponseMessage message)
