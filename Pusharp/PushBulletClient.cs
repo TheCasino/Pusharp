@@ -1,4 +1,4 @@
-using Pusharp.Models;
+﻿using Pusharp.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Pusharp.Entities;
@@ -30,6 +30,12 @@ namespace Pusharp
         {
             var devicesModel = await _requests.GetRequestAsync<DevicesModel>("/v2/devices");
             return devicesModel.Models.ToDevices();
+        }
+
+        public async Task<Device> CreateDeviceAsync(DeviceCreationParameters parameters)
+        {
+            var deviceModel = await _requests.PostRequestAsync<DeviceModel, DeviceCreationParameters>("/v2/devices", parameters);
+            return new Device(deviceModel);
         }
     }
 }
