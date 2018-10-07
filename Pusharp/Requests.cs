@@ -24,6 +24,8 @@ namespace Pusharp
 
         private string _rateLimit;
         private string _rateLimitReset;
+
+        //default to 1 because the initial ping doesn't use a request
         private string _remaining = "1";
 
         private int RateLimit => int.TryParse(_rateLimit, out var value) ? value : 0;
@@ -65,6 +67,8 @@ namespace Pusharp
             using (var response = await _client.SendAsync(request).ConfigureAwait(false))
             {
                 ParseResponseHeaders(response);
+
+                //TODO response.StatusCode parsing
 
                 if (!response.IsSuccessStatusCode)
                     throw new Exception(await response.Content.ReadAsStringAsync());

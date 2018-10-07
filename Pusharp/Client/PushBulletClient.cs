@@ -1,15 +1,12 @@
-using System;
 using Pusharp.Entities;
 using Pusharp.Models;
-using Pusharp.RequestParameters;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Pusharp
 {
-    public class PushBulletClient
+    public partial class PushBulletClient
     {
         //TODO log event
 
@@ -36,18 +33,7 @@ namespace Pusharp
             var authentication = await requests.SendAsync<CurrentUserModel>("/v2/users/me", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
 
             return new PushBulletClient(requests, authentication);
-        }
 
-        public async Task<IReadOnlyCollection<Device>> GetDevicesAsync()
-        {
-            var devicesModel = await _requests.SendAsync<DevicesModel>("/v2/devices", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
-            return devicesModel.Models.ToDevices().ToList();
-        }
-
-        public async Task<Device> CreateDeviceAsync(DeviceCreationParameters parameters)
-        {
-            var deviceModel = await _requests.SendAsync<DeviceModel>("/v2/devices", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
-            return new Device(deviceModel);
         }
     }
 }
