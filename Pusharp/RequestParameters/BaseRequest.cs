@@ -2,7 +2,7 @@
 
 namespace Pusharp.RequestParameters
 {
-    public abstract class BaseRequest : IRequestParameters
+    public abstract class BaseRequest
     {
         public abstract bool VerifyParameters();
 
