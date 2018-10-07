@@ -3,12 +3,13 @@ using Pusharp.Models;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Pusharp.Utilities;
 
 namespace Pusharp
 {
     public partial class PushBulletClient
     {
-        //TODO log event
+        public event Func<LogMessage, Task> Log;
 
         private readonly Requests _requests;
 
@@ -18,6 +19,12 @@ namespace Pusharp
         {
             _requests = requests;
             CurrentUser = new CurrentUser(model);
+            _requests.PushBulletClient = this;
+        }
+
+        internal Task InternalLogAsync(LogMessage message)
+        {
+            return Log?.Invoke(message);
         }
 
         public static async Task<PushBulletClient> CreateClientAsync(string accessToken, PushBulletClientConfig config = null)
@@ -26,7 +33,7 @@ namespace Pusharp
 
             var requests = new Requests(accessToken, config);
             var ping = await requests.SendAsync<PingModel>(string.Empty).ConfigureAwait(false);
-            
+
             if(!ping.IsHappy)
                 throw new Exception("something");
 

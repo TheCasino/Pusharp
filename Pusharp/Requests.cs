@@ -1,11 +1,13 @@
 ﻿using Pusharp.RequestParameters;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Pusharp.Utilities;
 using Voltaic.Serialization.Json;
 
 namespace Pusharp
@@ -30,6 +32,8 @@ namespace Pusharp
 
         private int RateLimit => int.TryParse(_rateLimit, out var value) ? value : 0;
         private int Remaining => int.TryParse(_remaining, out var amount) ? amount : 0;
+
+        public PushBulletClient PushBulletClient { get; set; } // TODO: Something nicer
 
         private DateTimeOffset RateLimitReset => DateTimeOffset.FromUnixTimeSeconds(long.TryParse(_rateLimitReset, out var seconds) ? seconds : 0);
 
@@ -57,16 +61,18 @@ namespace Pusharp
             if(CalculateCost(isDatabaseRequest, hits) > Remaining)
             {
                 _semaphore.Release();
-                throw new Exception("pre-emptive ratelimit :(");
+                await PushBulletClient.InternalLogAsync(new LogMessage(LogLevel.Warning, $"Hit pre-emptive ratelimit on {endpoint}!"));
             }
 
             var request = new HttpRequestMessage(method, endpoint);
             parameters = parameters ?? EmptyParameters.Create();
             parameters.VerifyParameters();
             request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8, "application/json");
-
+            var requestTime = Stopwatch.StartNew();
             using (var response = await _client.SendAsync(request).ConfigureAwait(false))
             {
+                requestTime.Stop();
+                if (PushBulletClient != null) await PushBulletClient.InternalLogAsync(new LogMessage(LogLevel.Verbose, $"{method} {endpoint}: {requestTime.ElapsedMilliseconds}ms"));
                 ParseResponseHeaders(response);
 
                 //TODO response.StatusCode parsing
