@@ -7,6 +7,9 @@ using Pusharp.Utilities;
 
 namespace Pusharp
 {
+    /// <summary>
+    ///     The base class for interfacing with the Pushbullet API.
+    /// </summary>
     public partial class PushBulletClient
     {
         public event Func<LogMessage, Task> Log;
@@ -27,6 +30,13 @@ namespace Pusharp
             return Log != null ? Log.Invoke(message) : Task.CompletedTask;
         }
 
+        /// <summary>
+        ///     Creates a Pushbullet API client from an access token.
+        /// </summary>
+        /// <param name="accessToken">The Pushbullet access token to authorise with.</param>
+        /// <param name="config">The optional client configuration to customise API requests from this client.</param>
+        /// <returns>A configured and set-up Pushbullet API client.</returns>
+        /// <exception cref="Exception">Thrown if the initial API ping request fails.</exception>
         public static async Task<PushBulletClient> CreateClientAsync(string accessToken, PushBulletClientConfig config = null)
         {
             config = config ?? new PushBulletClientConfig();
@@ -35,7 +45,7 @@ namespace Pusharp
             var ping = await requests.SendAsync<PingModel>(string.Empty).ConfigureAwait(false);
 
             if(!ping.IsHappy)
-                throw new Exception("something");
+                throw new Exception($"{ping.Cat} The ping request is not happy!");
 
             var authentication = await requests.SendAsync<CurrentUserModel>("/v2/users/me", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
 
