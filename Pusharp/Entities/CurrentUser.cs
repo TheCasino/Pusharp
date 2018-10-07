@@ -1,9 +1,9 @@
 ﻿using System;
-using Model = Pusharp.Models.AuthenticationModel;
+using Model = Pusharp.Models.CurrentUserModel;
 
 namespace Pusharp.Entities
 {
-    public class AuthenticationResult
+    public class CurrentUser
     {
         private readonly Model _model;
 
@@ -22,7 +22,7 @@ namespace Pusharp.Entities
         public DateTimeOffset Created => _model.Created.ToDateTime();
         public DateTimeOffset Modified => _model.Created.ToDateTime();
 
-        internal AuthenticationResult(Model model)
+        internal CurrentUser(Model model)
         {
             _model = model;
         }

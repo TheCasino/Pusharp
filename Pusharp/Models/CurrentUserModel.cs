@@ -2,7 +2,7 @@
 
 namespace Pusharp.Models
 {
-    internal class AuthenticationModel
+    internal class CurrentUserModel
     {
         [ModelProperty("active")]
         public bool Active { get; set; }

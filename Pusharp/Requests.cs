@@ -32,7 +32,7 @@ namespace Pusharp
 
         public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, BaseRequest parameters = null)
         {
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
 
             var request = new HttpRequestMessage(method, endpoint);
             parameters = parameters ?? EmptyParameters.Create();
@@ -50,7 +50,6 @@ namespace Pusharp
         private async Task<T> HandleResponseAsync<T>(HttpResponseMessage message)
         {
             var result = await message.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-            Console.WriteLine(result);
 
             _semaphore.Release();
             return _serializer.ReadUtf8<T>(new ReadOnlySpan<byte>(result));
