@@ -32,7 +32,7 @@ namespace Pusharp
         private int Remaining => int.TryParse(_remaining, out var amount) ? amount : 0;
 
         private DateTimeOffset RateLimitReset => DateTimeOffset.FromUnixTimeSeconds(long.TryParse(_rateLimitReset, out var seconds) ? seconds : 0);
-        
+
         public Requests(string accessToken, PushBulletClientConfig config)
         {
             _client = new HttpClient
@@ -62,6 +62,7 @@ namespace Pusharp
 
             var request = new HttpRequestMessage(method, endpoint);
             parameters = parameters ?? EmptyParameters.Create();
+            parameters.VerifyParameters();
             request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8, "application/json");
 
             using (var response = await _client.SendAsync(request).ConfigureAwait(false))

@@ -28,7 +28,7 @@ namespace Pusharp.RequestParameters
 
         public override bool VerifyParameters()
         {
-            throw new System.NotImplementedException();
+            return true;
         }
 
         public override string BuildContent(JsonSerializer serializer)
