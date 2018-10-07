@@ -19,9 +19,9 @@ namespace Pusharp
             CurrentUser = new CurrentUser(model);
         }
 
-        public static async Task<PushBulletClient> CreateClientAsync(string accessToken, PushBulletClientConfig config)
+        public static async Task<PushBulletClient> CreateClientAsync(string accessToken, PushBulletClientConfig config = null)
         {
-            var requests = new Requests(accessToken, config);
+            var requests = new Requests(accessToken, config ?? new PushBulletClientConfig());
 
             var authentication = await requests.SendAsync<CurrentUserModel>("/v2/users/me", HttpMethod.Get).ConfigureAwait(false);
 
