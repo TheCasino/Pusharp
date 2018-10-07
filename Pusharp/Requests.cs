@@ -1,6 +1,7 @@
 ﻿using Pusharp.RequestParameters;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -12,15 +13,27 @@ namespace Pusharp
 {
     internal class Requests
     {
+        public const int FreeAccountPushLimit = 500; // Pushbullet Free accounts are limited to 500 pushes per month.
+
         private readonly HttpClient _client;
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _semaphore;
+        private readonly PushBulletClientConfig _config;
 
-        public Requests(string accessToken)
+        public const string RatelimitLimitHeaderName = "X-Ratelimit-Limit";
+        public const string RatelimitRemainingHeaderName = "X-Ratelimit-Remaining";
+        public const string RatelimitResetHeaderName = "X-Ratelimit-Reset";
+
+        private int _ratelimitLimit;
+        private int _ratelimitRemaining;
+        private DateTimeOffset _ratelimitReset;
+
+        public Requests(string accessToken, PushBulletClientConfig config)
         {
+            _config = config;
             _client = new HttpClient
             {
-                BaseAddress = new Uri("https://api.pushbullet.com")
+                BaseAddress = new Uri(_config.ApiBaseUrl)
             };
 
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -40,10 +53,30 @@ namespace Pusharp
 
             using (var response = await _client.SendAsync(request).ConfigureAwait(false))
             {
+                ParseResponseHeaders(response);
+
                 if (!response.IsSuccessStatusCode)
                     throw new Exception(await response.Content.ReadAsStringAsync());
 
                 return await HandleResponseAsync<T>(response).ConfigureAwait(false);
+            }
+        }
+
+        private void ParseResponseHeaders(HttpResponseMessage message)
+        {
+            if (message.Headers.Contains(RatelimitLimitHeaderName))
+            {
+                _ratelimitLimit = int.Parse(message.Headers.GetValues(RatelimitLimitHeaderName).FirstOrDefault() ?? throw new ArgumentNullException(RatelimitLimitHeaderName));
+            }
+
+            if (message.Headers.Contains(RatelimitRemainingHeaderName))
+            {
+                _ratelimitRemaining = int.Parse(message.Headers.GetValues(RatelimitRemainingHeaderName).FirstOrDefault() ?? throw new ArgumentNullException(RatelimitRemainingHeaderName));
+            }
+
+            if (message.Headers.Contains(RatelimitResetHeaderName))
+            {
+                _ratelimitReset = DateTimeOffset.FromUnixTimeSeconds(long.Parse(message.Headers.GetValues(RatelimitResetHeaderName).FirstOrDefault() ?? throw new ArgumentNullException(RatelimitResetHeaderName)));
             }
         }
 
