@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Pusharp.RequestParameters;
+using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Voltaic.Serialization.Json;
 
@@ -10,6 +14,13 @@ namespace Pusharp
     {
         private readonly HttpClient _client;
         private readonly JsonSerializer _serializer;
+        private readonly SemaphoreSlim _semaphore;
+
+        private readonly IReadOnlyDictionary<RequestType, HttpMethod> _requestType = new Dictionary<RequestType, HttpMethod>
+        {
+            { RequestType.GET, HttpMethod.Get },
+            { RequestType.POST, HttpMethod.Post }
+        };
 
         public Requests(string accessToken)
         {
@@ -22,31 +33,33 @@ namespace Pusharp
             _client.DefaultRequestHeaders.Add("Access-Token", accessToken);
 
             _serializer = new JsonSerializer();
+            _semaphore = new SemaphoreSlim(1, 1);
         }
 
-        public async Task<T> GetRequestAsync<T>(string endpoint)
+        public async Task<T> SendAsync<T>(string endpoint, RequestType type, BaseRequest parameters = null)
         {
-            using (var post = await _client.GetAsync(endpoint).ConfigureAwait(false))
+            await _semaphore.WaitAsync();
+
+            var request = new HttpRequestMessage(_requestType[type], endpoint);
+            parameters = parameters ?? EmptyParameters.Create();
+            request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8, "application/json");
+
+            using (var response = await _client.SendAsync(request).ConfigureAwait(false))
             {
-                //for testing
-                try
-                {
-                    if (!post.IsSuccessStatusCode)
-                        throw new Exception("gud exception");
+                if (!response.IsSuccessStatusCode)
+                    throw new Exception(await response.Content.ReadAsStringAsync());
 
-                    var result = await post.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-
-                    //for testing
-                    Console.WriteLine(await post.Content.ReadAsStringAsync());
-
-                    return _serializer.ReadUtf8<T>(new ReadOnlySpan<byte>(result));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                    return default;
-                }
+                return await HandleResponseAsync<T>(response).ConfigureAwait(false);
             }
+        }
+
+        private async Task<T> HandleResponseAsync<T>(HttpResponseMessage message)
+        {
+            var result = await message.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+            Console.WriteLine(result);
+
+            _semaphore.Release();
+            return _serializer.ReadUtf8<T>(new ReadOnlySpan<byte>(result));
         }
     }
 }
