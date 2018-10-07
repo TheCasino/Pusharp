@@ -1,4 +1,5 @@
-﻿using Voltaic.Serialization;
+﻿using System;
+using Voltaic.Serialization;
 using Voltaic.Serialization.Json;
 
 namespace Pusharp.RequestParameters
@@ -28,7 +29,7 @@ namespace Pusharp.RequestParameters
 
         public override bool VerifyParameters()
         {
-            return true;
+            throw new NotImplementedException();
         }
 
         public override string BuildContent(JsonSerializer serializer)

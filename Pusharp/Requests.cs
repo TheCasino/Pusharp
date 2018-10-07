@@ -66,7 +66,9 @@ namespace Pusharp
 
             var request = new HttpRequestMessage(method, endpoint);
             parameters = parameters ?? EmptyParameters.Create();
-            parameters.VerifyParameters();
+
+            //TODO parameters.VerifyParameters();
+
             request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8, "application/json");
             var requestTime = Stopwatch.StartNew();
             using (var response = await _client.SendAsync(request).ConfigureAwait(false))
