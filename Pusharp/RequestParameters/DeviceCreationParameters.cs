@@ -1,4 +1,5 @@
 ﻿using Voltaic.Serialization;
+using Voltaic.Serialization.Json;
 
 namespace Pusharp.RequestParameters
 {
@@ -29,5 +30,8 @@ namespace Pusharp.RequestParameters
         {
             throw new System.NotImplementedException();
         }
+
+        public override string BuildContent(JsonSerializer serializer)
+            => serializer.WriteUtf16String(this);
     }
 }

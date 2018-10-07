@@ -21,20 +21,21 @@ namespace Pusharp
         public static async Task<PushBulletClient> CreateClientAsync(string accessToken)
         {
             var requests = new Requests(accessToken);
-            var authentication = await requests.GetRequestAsync<AuthenticationModel>("/v2/users/me").ConfigureAwait(false);
+            
+            var authentication = await requests.SendAsync<AuthenticationModel>("/v2/users/me", RequestType.GET).ConfigureAwait(false);
 
             return new PushBulletClient(requests, authentication);
         }
 
         public async Task<IEnumerable<Device>> GetDevicesAsync()
         {
-            var devicesModel = await _requests.GetRequestAsync<DevicesModel>("/v2/devices");
+            var devicesModel = await _requests.SendAsync<DevicesModel>("/v2/devices", RequestType.GET);
             return devicesModel.Models.ToDevices();
         }
 
         public async Task<Device> CreateDeviceAsync(DeviceCreationParameters parameters)
         {
-            var deviceModel = await _requests.PostRequestAsync<DeviceModel, DeviceCreationParameters>("/v2/devices", parameters);
+            var deviceModel = await _requests.SendAsync<DeviceModel>("/v2/devices", RequestType.POST, parameters);
             return new Device(deviceModel);
         }
     }
