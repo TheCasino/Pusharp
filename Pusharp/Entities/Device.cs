@@ -1,7 +1,7 @@
 ﻿using System;
 using Model = Pusharp.Models.DeviceModel;
 
-namespace Pusharp.Results
+namespace Pusharp.Entities
 {
     public class Device
     {

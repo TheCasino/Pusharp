@@ -1,7 +1,7 @@
 ﻿using System;
 using Model = Pusharp.Models.AuthenticationModel;
 
-namespace Pusharp.Results
+namespace Pusharp.Entities
 {
     public class AuthenticationResult
     {

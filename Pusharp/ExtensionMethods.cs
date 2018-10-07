@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Pusharp.Entities;
 using Pusharp.Models;
-using Pusharp.Results;
 
 namespace Pusharp
 {

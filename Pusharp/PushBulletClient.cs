@@ -1,7 +1,8 @@
-﻿using Pusharp.Models;
-using Pusharp.Results;
+using Pusharp.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Pusharp.Entities;
+using Pusharp.RequestParameters;
 
 namespace Pusharp
 {
