@@ -24,7 +24,7 @@ namespace Pusharp
 
         internal Task InternalLogAsync(LogMessage message)
         {
-            return Log?.Invoke(message);
+            return Log != null ? Log.Invoke(message) : Task.CompletedTask;
         }
 
         public static async Task<PushBulletClient> CreateClientAsync(string accessToken, PushBulletClientConfig config = null)
