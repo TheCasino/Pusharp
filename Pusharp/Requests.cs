@@ -16,12 +16,6 @@ namespace Pusharp
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _semaphore;
 
-        private readonly IReadOnlyDictionary<RequestType, HttpMethod> _requestType = new Dictionary<RequestType, HttpMethod>
-        {
-            { RequestType.GET, HttpMethod.Get },
-            { RequestType.POST, HttpMethod.Post }
-        };
-
         public Requests(string accessToken)
         {
             _client = new HttpClient
@@ -36,11 +30,11 @@ namespace Pusharp
             _semaphore = new SemaphoreSlim(1, 1);
         }
 
-        public async Task<T> SendAsync<T>(string endpoint, RequestType type, BaseRequest parameters = null)
+        public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, BaseRequest parameters = null)
         {
             await _semaphore.WaitAsync();
 
-            var request = new HttpRequestMessage(_requestType[type], endpoint);
+            var request = new HttpRequestMessage(method, endpoint);
             parameters = parameters ?? EmptyParameters.Create();
             request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8, "application/json");
 
