@@ -12,10 +12,16 @@ namespace Pusharp
     /// </summary>
     public partial class PushBulletClient
     {
+        /// <summary>
+        ///     This event is invoked when the client wishes to log a message. (i.e. an endpoint is invoked)
+        /// </summary>
         public event Func<LogMessage, Task> Log;
 
         private readonly Requests _requests;
 
+        /// <summary>
+        ///     The current user that is logged into this client.
+        /// </summary>
         public CurrentUser CurrentUser { get; }
 
         private PushBulletClient(Requests requests, CurrentUserModel model)
