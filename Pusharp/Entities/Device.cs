@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Pusharp.RequestParameters;
@@ -60,6 +61,9 @@ namespace Pusharp.Entities
         /// <returns>A <see cref="Task" /> representing the asynchronous delete operation.</returns>
         public async Task DeleteAsync()
         {
+            if(!IsActive)
+                throw new Exception("Device must be active");
+
             await _client.RequestClient.SendAsync($"/devices/{Identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
         }
     }
