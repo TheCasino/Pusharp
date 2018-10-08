@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Pusharp.RequestParameters;
 using Pusharp.Utilities;
 using Model = Pusharp.Models.DeviceModel;
 
@@ -6,6 +8,7 @@ namespace Pusharp.Entities
 {
     public class Device
     {
+        private readonly PushBulletClient _client;
         private readonly Model _model;
 
         public bool IsActive => _model.Active;
@@ -31,9 +34,22 @@ namespace Pusharp.Entities
         public string Icon => _model.Icon;
         public string RemoteFiles => _model.RemoteFiles;
 
-        internal Device(Model model)
+        internal Device(Model model, PushBulletClient client)
         {
             _model = model;
+            _client = client;
+        }
+
+        /// <summary>
+        ///     Updates this device's properties, returning a mutated form of this device.
+        /// </summary>
+        /// <param name="parameterOperator">The <see cref="Action{DeviceParameters}"/> to use when updating this device.</param>
+        /// <returns>A new <see cref="Device"/>, representing the updated device.</returns>
+        public Task<Device> ModifyAsync(Action<DeviceParameters> parameterOperator)
+        {
+            var parameters = new DeviceParameters();
+            parameterOperator(parameters);
+            return _client.UpdateDeviceAsync(Identifier, parameters);
         }
     }
 }

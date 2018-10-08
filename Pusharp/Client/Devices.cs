@@ -19,7 +19,7 @@ namespace Pusharp
         public async Task<IReadOnlyCollection<Device>> GetDevicesAsync()
         {
             var devicesModel = await _requests.SendAsync<DevicesModel>("/devices", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
-            return devicesModel.Models.Select(a => new Device(a)).ToImmutableList();
+            return devicesModel.Models.Select(a => new Device(a, this)).ToImmutableList();
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Pusharp
         public async Task<Device> CreateDeviceAsync(DeviceParameters parameters)
         {
             var deviceModel = await _requests.SendAsync<DeviceModel>("/devices", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
-            return new Device(deviceModel);
+            return new Device(deviceModel, _requests.PushBulletClient);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Pusharp
         public async Task<Device> UpdateDeviceAsync(string identifier, DeviceParameters parameters)
         {
             var deviceModel = await _requests.SendAsync<DeviceModel>($"/devices/{identifier}", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
-            return new Device(deviceModel);
+            return new Device(deviceModel, _requests.PushBulletClient);
         }
 
         /// <summary>
