@@ -14,57 +14,32 @@ namespace Pusharp.Entities
 
         internal Device(Model model, PushBulletClient client)
         {
-            Update(model);
+            _model = model;
             _client = client;
         }
 
-        public bool IsActive { get; private set; }
-        public bool GeneratedNickname { get; private set; }
-        public bool IsPushable { get; private set; }
-        public bool SmsEnabled { get; private set; }
-        public bool MmsEnabled { get; private set; }
+        public bool IsActive => _model.Active;
+        public bool GeneratedNickname => _model.GeneratedNickname;
+        public bool IsPushabke => _model.Pushable;
+        public bool SmsEnabled => _model.HasSms;
+        public bool MmsEnabled => _model.HasMms;
 
-        public int AppVersion { get; private set; }
+        public int AppVersion => _model.AppVersion;
 
-        public DateTimeOffset Created { get; private set; }
-        public DateTimeOffset Modified { get; private set; }
+        public DateTimeOffset Created => DateTimeHelpers.ToDateTime(_model.Created);
+        public DateTimeOffset Modified => DateTimeHelpers.ToDateTime(_model.Modified);
 
-        public string Identifier { get; private set; }
-        public string Manufacturer { get; private set; }
-        public string Model { get; private set; }
-        public string Nickname { get; private set; }
-        public string PushToken { get; private set; }
-        public string Type { get; private set; }
-        public string Kind { get; private set; }
-        public string Fingerprint { get; private set; }
-        public string KeyFingerprint { get; private set; }
-        public string Icon { get; private set; }
-        public string RemoteFiles { get; private set; }
-
-        internal void Update(Model model)
-        {
-            _model = model;
-
-            IsActive = model.Active;
-            GeneratedNickname = model.GeneratedNickname;
-            IsPushable = model.Pushable;
-            SmsEnabled = model.HasSms;
-            MmsEnabled = model.HasMms;
-            AppVersion = model.AppVersion;
-            Created = DateTimeHelpers.ToDateTime(model.Created);
-            Modified = DateTimeHelpers.ToDateTime(model.Modified);
-            Identifier = model.Iden;
-            Manufacturer = model.Manufacturer;
-            Model = model.Model;
-            Nickname = model.Nickname;
-            PushToken = model.PushToken;
-            Type = model.Type;
-            Kind = model.Kind;
-            Fingerprint = model.Fingerprint;
-            KeyFingerprint = model.KeyFingerprint;
-            Icon = model.Icon;
-            RemoteFiles = model.RemoteFiles;
-        }
+        public string Identifier => _model.Iden;
+        public string Manufacturer => _model.Manufacturer;
+        public string Model => _model.Model;
+        public string Nickname => _model.Nickname;
+        public string PushToken => _model.PushToken;
+        public string Type => _model.Type;
+        public string Kind => _model.Kind;
+        public string Fingerprint => _model.Fingerprint;
+        public string KeyFingerprint => _model.KeyFingerprint;
+        public string Icon => _model.Icon;
+        public string RemoteFiles => _model.RemoteFiles;
 
         /// <summary>
         ///     Updates this device's properties, returning a mutated form of this device.
@@ -76,7 +51,7 @@ namespace Pusharp.Entities
             parameterOperator(parameters);
 
             var result = await _client.RequestClient.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
-            Update(result);
+            _model = result;
         }
 
         /// <summary>
