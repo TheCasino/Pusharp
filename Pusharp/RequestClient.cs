@@ -74,7 +74,7 @@ namespace Pusharp
             if (CalculateCost(isDatabaseRequest, hits) > Remaining)
             {
                 _semaphore.Release();
-                await Client.InternalLogAsync(new LogMessage(LogLevel.Warning, $"Hit pre-emptive ratelimit on {endpoint}!"));
+                throw new RatelimitedException(method, endpoint, Remaining);
             }
 
             var request = new HttpRequestMessage(method, endpoint);
