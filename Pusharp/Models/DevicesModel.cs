@@ -4,7 +4,6 @@ namespace Pusharp.Models
 {
     internal class DevicesModel
     {
-        [ModelProperty("devices")]
-        public DeviceModel[] Models { get; set; }
+        [ModelProperty("devices")] public DeviceModel[] Models { get; set; }
     }
 }

@@ -8,6 +8,11 @@ namespace Pusharp.Entities
     {
         private readonly Model _model;
 
+        internal CurrentUser(Model model)
+        {
+            _model = model;
+        }
+
         public bool IsActive => _model.Active;
 
         public string Name => _model.Name;
@@ -22,10 +27,5 @@ namespace Pusharp.Entities
 
         public DateTimeOffset Created => _model.Created.ToDateTime();
         public DateTimeOffset Modified => _model.Created.ToDateTime();
-
-        internal CurrentUser(Model model)
-        {
-            _model = model;
-        }
     }
 }

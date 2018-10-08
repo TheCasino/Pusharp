@@ -1,8 +1,8 @@
-using Pusharp.Entities;
-using Pusharp.Models;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Pusharp.Entities;
+using Pusharp.Models;
 using Pusharp.Utilities;
 
 namespace Pusharp
@@ -12,17 +12,7 @@ namespace Pusharp
     /// </summary>
     public partial class PushBulletClient
     {
-        /// <summary>
-        ///     This event is invoked when the client wishes to log a message. (i.e. an endpoint is invoked)
-        /// </summary>
-        public event Func<LogMessage, Task> Log;
-
         internal readonly RequestClient RequestClient;
-
-        /// <summary>
-        ///     The current user that is logged into this client.
-        /// </summary>
-        public CurrentUser CurrentUser { get; }
 
         private PushBulletClient(RequestClient requestClient, CurrentUserModel model)
         {
@@ -30,6 +20,16 @@ namespace Pusharp
             CurrentUser = new CurrentUser(model);
             RequestClient.Client = this;
         }
+
+        /// <summary>
+        ///     The current user that is logged into this client.
+        /// </summary>
+        public CurrentUser CurrentUser { get; }
+
+        /// <summary>
+        ///     This event is invoked when the client wishes to log a message. (i.e. an endpoint is invoked)
+        /// </summary>
+        public event Func<LogMessage, Task> Log;
 
         internal Task InternalLogAsync(LogMessage message)
         {
@@ -50,13 +50,12 @@ namespace Pusharp
             var requests = new RequestClient(accessToken, config);
             var ping = await requests.SendAsync<PingModel>(string.Empty).ConfigureAwait(false);
 
-            if(!ping.IsHappy)
+            if (!ping.IsHappy)
                 throw new Exception($"{ping.Cat} The ping request is not happy!");
 
             var authentication = await requests.SendAsync<CurrentUserModel>("/users/me", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
 
             return new PushBulletClient(requests, authentication);
-
         }
     }
 }

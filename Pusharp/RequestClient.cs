@@ -1,5 +1,4 @@
-﻿using Pusharp.RequestParameters;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
@@ -8,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Pusharp.Models;
+using Pusharp.RequestParameters;
 using Pusharp.Utilities;
 using Voltaic.Serialization.Json;
 
@@ -17,26 +17,19 @@ namespace Pusharp
     {
         public const int FreeAccountPushLimit = 500; // Pushbullet Free accounts are limited to 500 pushes per month.
 
-        private readonly HttpClient _http;
-        private readonly JsonSerializer _serializer;
-        private readonly SemaphoreSlim _semaphore;
-
         private const string RatelimitLimitHeaderName = "X-Ratelimit-Limit";
         private const string RatelimitRemainingHeaderName = "X-Ratelimit-Remaining";
         private const string RatelimitResetHeaderName = "X-Ratelimit-Reset";
+
+        private readonly HttpClient _http;
+        private readonly SemaphoreSlim _semaphore;
+        private readonly JsonSerializer _serializer;
 
         private string _rateLimit;
         private string _rateLimitReset;
 
         //default to 1 because the initial ping doesn't use a request
         private string _remaining = "1";
-
-        private int RateLimit => int.TryParse(_rateLimit, out var value) ? value : 0;
-        private int Remaining => int.TryParse(_remaining, out var amount) ? amount : 0;
-
-        public PushBulletClient Client { get; set; } // TODO: Something nicer
-
-        private DateTimeOffset RateLimitReset => DateTimeOffset.FromUnixTimeSeconds(long.TryParse(_rateLimitReset, out var seconds) ? seconds : 0);
 
         public RequestClient(string accessToken, PushBulletClientConfig config)
         {
@@ -52,18 +45,33 @@ namespace Pusharp
             _semaphore = new SemaphoreSlim(1, 1);
         }
 
-        public Task SendAsync(string endpoint) => SendAsync<EmptyModel>(endpoint);
+        private int RateLimit => int.TryParse(_rateLimit, out var value) ? value : 0;
+        private int Remaining => int.TryParse(_remaining, out var amount) ? amount : 0;
+
+        public PushBulletClient Client { get; set; } // TODO: Something nicer
+
+        private DateTimeOffset RateLimitReset => DateTimeOffset.FromUnixTimeSeconds(long.TryParse(_rateLimitReset, out var seconds) ? seconds : 0);
+
+        public Task SendAsync(string endpoint)
+        {
+            return SendAsync<EmptyModel>(endpoint);
+        }
 
         public Task<T> SendAsync<T>(string endpoint)
-            => SendAsync<T>(endpoint, HttpMethod.Get, false, 0, null);
+        {
+            return SendAsync<T>(endpoint, HttpMethod.Get, false, 0, null);
+        }
 
-        public Task SendAsync(string endpoint, HttpMethod method, bool isDatabaseRequest, int hits, BaseRequest parameters) => SendAsync<EmptyModel>(endpoint, method, isDatabaseRequest, hits, parameters);
+        public Task SendAsync(string endpoint, HttpMethod method, bool isDatabaseRequest, int hits, BaseRequest parameters)
+        {
+            return SendAsync<EmptyModel>(endpoint, method, isDatabaseRequest, hits, parameters);
+        }
 
         public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, bool isDatabaseRequest, int hits, BaseRequest parameters)
         {
             await _semaphore.WaitAsync().ConfigureAwait(false);
 
-            if(CalculateCost(isDatabaseRequest, hits) > Remaining)
+            if (CalculateCost(isDatabaseRequest, hits) > Remaining)
             {
                 _semaphore.Release();
                 await Client.InternalLogAsync(new LogMessage(LogLevel.Warning, $"Hit pre-emptive ratelimit on {endpoint}!"));
@@ -72,7 +80,9 @@ namespace Pusharp
             var request = new HttpRequestMessage(method, endpoint);
             parameters = parameters ?? EmptyParameters.Create();
 
-            //TODO parameters.VerifyParameters();
+            var builder = new ParameterBuilder();
+            parameters.VerifyParameters(builder);
+            builder.ValidateParameters();
 
             request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8, "application/json");
             var requestTime = Stopwatch.StartNew();
@@ -92,7 +102,9 @@ namespace Pusharp
         }
 
         private static int CalculateCost(bool isDatabaseRequest, int hits = 0)
-            => 1 + (isDatabaseRequest ? 4 : 0) * hits;
+        {
+            return 1 + (isDatabaseRequest ? 4 : 0) * hits;
+        }
 
         private void ParseResponseHeaders(HttpResponseMessage message)
         {

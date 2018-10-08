@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Pusharp.Models;
 using Pusharp.RequestParameters;
 using Pusharp.Utilities;
 using Model = Pusharp.Models.DeviceModel;
@@ -12,6 +11,12 @@ namespace Pusharp.Entities
     {
         private readonly PushBulletClient _client;
         private Model _model;
+
+        internal Device(Model model, PushBulletClient client)
+        {
+            Update(model);
+            _client = client;
+        }
 
         public bool IsActive { get; private set; }
         public bool GeneratedNickname { get; private set; }
@@ -35,12 +40,6 @@ namespace Pusharp.Entities
         public string KeyFingerprint { get; private set; }
         public string Icon { get; private set; }
         public string RemoteFiles { get; private set; }
-
-        internal Device(Model model, PushBulletClient client)
-        {
-            Update(model);
-            _client = client;
-        }
 
         internal void Update(Model model)
         {
@@ -70,7 +69,7 @@ namespace Pusharp.Entities
         /// <summary>
         ///     Updates this device's properties, returning a mutated form of this device.
         /// </summary>
-        /// <param name="parameterOperator">The <see cref="Action{DeviceParameters}"/> to use when updating this device.</param>
+        /// <param name="parameterOperator">The <see cref="Action{DeviceParameters}" /> to use when updating this device.</param>
         public async Task ModifyAsync(Action<DeviceParameters> parameterOperator)
         {
             var parameters = new DeviceParameters();
@@ -83,7 +82,10 @@ namespace Pusharp.Entities
         /// <summary>
         ///     Deletes this device from the Pushbullet service.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous delete operation.</returns>
-        public async Task DeleteAsync() => await _client.RequestClient.SendAsync($"/devices/{Identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
+        /// <returns>A <see cref="Task" /> representing the asynchronous delete operation.</returns>
+        public async Task DeleteAsync()
+        {
+            await _client.RequestClient.SendAsync($"/devices/{Identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
+        }
     }
 }
