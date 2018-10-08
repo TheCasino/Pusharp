@@ -21,7 +21,7 @@ namespace Pusharp.Utilities
         }
     }
 
-    internal class ParameterFailedException : Exception
+    public class ParameterFailedException : Exception
     {
         internal ParameterFailedException(string reason) : base("The following requirement failed: " + reason)
         {
