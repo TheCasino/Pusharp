@@ -17,7 +17,7 @@ namespace Pusharp
         /// </summary>
         public event Func<LogMessage, Task> Log;
 
-        private readonly Requests _requests;
+        internal readonly Requests Requests;
 
         /// <summary>
         ///     The current user that is logged into this client.
@@ -26,9 +26,9 @@ namespace Pusharp
 
         private PushBulletClient(Requests requests, CurrentUserModel model)
         {
-            _requests = requests;
+            Requests = requests;
             CurrentUser = new CurrentUser(model);
-            _requests.PushBulletClient = this;
+            Requests.PushBulletClient = this;
         }
 
         internal Task InternalLogAsync(LogMessage message)

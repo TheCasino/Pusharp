@@ -14,7 +14,7 @@ namespace Pusharp
         /// <param name="parameters">The parameters to use when sending the message.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous send operation.</returns>
         public async Task SendSmsAsync(SmsParameters parameters)
-            => await _requests.SendAsync<EmptyModel>("/ephemerals", HttpMethod.Post, true, 1, parameters)
+            => await Requests.SendAsync<EmptyModel>("/ephemerals", HttpMethod.Post, true, 1, parameters)
                 .ConfigureAwait(false);
 
         /// <summary>

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Pusharp.Models;
 using Pusharp.RequestParameters;
 using Pusharp.Utilities;
 using Model = Pusharp.Models.DeviceModel;
@@ -9,47 +11,79 @@ namespace Pusharp.Entities
     public class Device
     {
         private readonly PushBulletClient _client;
-        private readonly Model _model;
+        private Model _model;
 
-        public bool IsActive => _model.Active;
-        public bool GeneratedNickname => _model.GeneratedNickname;
-        public bool IsPushabke => _model.Pushable;
-        public bool SmsEnabled => _model.HasSms;
-        public bool MmsEnabled => _model.HasMms;
+        public bool IsActive { get; private set; }
+        public bool GeneratedNickname { get; private set; }
+        public bool IsPushable { get; private set; }
+        public bool SmsEnabled { get; private set; }
+        public bool MmsEnabled { get; private set; }
 
-        public int AppVersion => _model.AppVersion;
+        public int AppVersion { get; private set; }
 
-        public DateTimeOffset Created => _model.Created.ToDateTime();
-        public DateTimeOffset Modified => _model.Modified.ToDateTime();
+        public DateTimeOffset Created { get; private set; }
+        public DateTimeOffset Modified { get; private set; }
 
-        public string Identifier => _model.Iden;
-        public string Manufacturer => _model.Manufacturer;
-        public string Model => _model.Model;
-        public string Nickname => _model.Nickname;
-        public string PushToken => _model.PushToken;
-        public string Type => _model.Type;
-        public string Kind => _model.Kind;
-        public string Fingerprint => _model.Fingerprint;
-        public string KeyFingerprint => _model.KeyFingerprint;
-        public string Icon => _model.Icon;
-        public string RemoteFiles => _model.RemoteFiles;
+        public string Identifier { get; private set; }
+        public string Manufacturer { get; private set; }
+        public string Model { get; private set; }
+        public string Nickname { get; private set; }
+        public string PushToken { get; private set; }
+        public string Type { get; private set; }
+        public string Kind { get; private set; }
+        public string Fingerprint { get; private set; }
+        public string KeyFingerprint { get; private set; }
+        public string Icon { get; private set; }
+        public string RemoteFiles { get; private set; }
 
         internal Device(Model model, PushBulletClient client)
         {
-            _model = model;
+            Update(model);
             _client = client;
+        }
+
+        internal void Update(Model model)
+        {
+            _model = model;
+
+            IsActive = model.Active;
+            GeneratedNickname = model.GeneratedNickname;
+            IsPushable = model.Pushable;
+            SmsEnabled = model.HasSms;
+            MmsEnabled = model.HasMms;
+            AppVersion = model.AppVersion;
+            Created = model.Created.ToDateTime();
+            Modified = model.Modified.ToDateTime();
+            Identifier = model.Iden;
+            Manufacturer = model.Manufacturer;
+            Model = model.Model;
+            Nickname = model.Nickname;
+            PushToken = model.PushToken;
+            Type = model.Type;
+            Kind = model.Kind;
+            Fingerprint = model.Fingerprint;
+            KeyFingerprint = model.KeyFingerprint;
+            Icon = model.Icon;
+            RemoteFiles = model.RemoteFiles;
         }
 
         /// <summary>
         ///     Updates this device's properties, returning a mutated form of this device.
         /// </summary>
         /// <param name="parameterOperator">The <see cref="Action{DeviceParameters}"/> to use when updating this device.</param>
-        /// <returns>A new <see cref="Device"/>, representing the updated device.</returns>
-        public Task<Device> ModifyAsync(Action<DeviceParameters> parameterOperator)
+        public async Task ModifyAsync(Action<DeviceParameters> parameterOperator)
         {
             var parameters = new DeviceParameters();
             parameterOperator(parameters);
-            return _client.UpdateDeviceAsync(Identifier, parameters);
+
+            var result = await _client.Requests.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
+            Update(result);
         }
+
+        /// <summary>
+        ///     Deletes this device from the Pushbullet service.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous delete operation.</returns>
+        public async Task DeleteAsync() => await _client.Requests.SendAsync<EmptyModel>($"/devices/{Identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
     }
 }
