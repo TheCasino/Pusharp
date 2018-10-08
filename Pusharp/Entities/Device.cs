@@ -1,9 +1,8 @@
-﻿using System;
-using System.Diagnostics;
+﻿using Pusharp.RequestParameters;
+using Pusharp.Utilities;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Pusharp.RequestParameters;
-using Pusharp.Utilities;
 using Model = Pusharp.Models.DeviceModel;
 
 namespace Pusharp.Entities
