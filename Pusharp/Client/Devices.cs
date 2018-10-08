@@ -32,28 +32,5 @@ namespace Pusharp
             var deviceModel = await Requests.SendAsync<DeviceModel>("/devices", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
             return new Device(deviceModel, Requests.PushBulletClient);
         }
-
-        /// <summary>
-        ///     Deletes a device from the client's account.
-        /// </summary>
-        /// <param name="device">The <see cref="Device"/> to delete.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous delete operation.</returns>
-        /// <exception cref="Exception">Thrown if the device is not active.</exception>
-        public Task DeleteDeviceAsync(Device device)
-        {
-            if(!device.IsActive)
-                throw new Exception("device must be active");
-
-            return DeleteDeviceAsync(device.Identifier);
-        }
-
-        /// <summary>
-        ///     Deletes a device from the client's account.
-        /// </summary>
-        /// <param name="identifier">The string identifier of the device to delete.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous delete operation.</returns>
-        /// <exception cref="Exception">Thrown if the device is not active.</exception>
-        public async Task DeleteDeviceAsync(string identifier)
-            => await Requests.SendAsync<EmptyModel>($"/devices/{identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
     }
 }
