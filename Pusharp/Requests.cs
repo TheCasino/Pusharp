@@ -17,7 +17,7 @@ namespace Pusharp
     {
         public const int FreeAccountPushLimit = 500; // Pushbullet Free accounts are limited to 500 pushes per month.
 
-        private readonly HttpClient _client;
+        private readonly HttpClient _http;
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _semaphore;
 
@@ -34,19 +34,19 @@ namespace Pusharp
         private int RateLimit => int.TryParse(_rateLimit, out var value) ? value : 0;
         private int Remaining => int.TryParse(_remaining, out var amount) ? amount : 0;
 
-        public PushBulletClient PushBulletClient { get; set; } // TODO: Something nicer
+        public PushBulletClient Client { get; set; } // TODO: Something nicer
 
         private DateTimeOffset RateLimitReset => DateTimeOffset.FromUnixTimeSeconds(long.TryParse(_rateLimitReset, out var seconds) ? seconds : 0);
 
         public Requests(string accessToken, PushBulletClientConfig config)
         {
-            _client = new HttpClient
+            _http = new HttpClient
             {
                 BaseAddress = new Uri(config.ApiBaseUrl)
             };
 
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _client.DefaultRequestHeaders.Add("Access-Token", accessToken);
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _http.DefaultRequestHeaders.Add("Access-Token", accessToken);
 
             _serializer = new JsonSerializer();
             _semaphore = new SemaphoreSlim(1, 1);
@@ -66,7 +66,7 @@ namespace Pusharp
             if(CalculateCost(isDatabaseRequest, hits) > Remaining)
             {
                 _semaphore.Release();
-                await PushBulletClient.InternalLogAsync(new LogMessage(LogLevel.Warning, $"Hit pre-emptive ratelimit on {endpoint}!"));
+                await Client.InternalLogAsync(new LogMessage(LogLevel.Warning, $"Hit pre-emptive ratelimit on {endpoint}!"));
             }
 
             var request = new HttpRequestMessage(method, endpoint);
@@ -76,10 +76,10 @@ namespace Pusharp
 
             request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8, "application/json");
             var requestTime = Stopwatch.StartNew();
-            using (var response = await _client.SendAsync(request).ConfigureAwait(false))
+            using (var response = await _http.SendAsync(request).ConfigureAwait(false))
             {
                 requestTime.Stop();
-                if (PushBulletClient != null) await PushBulletClient.InternalLogAsync(new LogMessage(LogLevel.Verbose, $"{method} {endpoint}: {requestTime.ElapsedMilliseconds}ms"));
+                if (Client != null) await Client.InternalLogAsync(new LogMessage(LogLevel.Verbose, $"{method} {endpoint}: {requestTime.ElapsedMilliseconds}ms"));
                 ParseResponseHeaders(response);
 
                 //TODO response.StatusCode parsing

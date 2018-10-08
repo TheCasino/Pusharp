@@ -28,7 +28,7 @@ namespace Pusharp
         {
             Requests = requests;
             CurrentUser = new CurrentUser(model);
-            Requests.PushBulletClient = this;
+            Requests.Client = this;
         }
 
         internal Task InternalLogAsync(LogMessage message)

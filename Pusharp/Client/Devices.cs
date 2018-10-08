@@ -30,7 +30,7 @@ namespace Pusharp
         public async Task<Device> CreateDeviceAsync(DeviceParameters parameters)
         {
             var deviceModel = await Requests.SendAsync<DeviceModel>("/devices", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
-            return new Device(deviceModel, Requests.PushBulletClient);
+            return new Device(deviceModel, Requests.Client);
         }
     }
 }
