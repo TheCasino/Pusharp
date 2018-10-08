@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Pusharp.Entities;
@@ -25,6 +27,18 @@ namespace Pusharp
         ///     The current user that is logged into this client.
         /// </summary>
         public CurrentUser CurrentUser { get; }
+
+        internal List<Device> Devices { get; } = new List<Device>();
+
+        /// <summary>
+        ///     Attempts to retrieve a <see cref="Device"/> from this client's cache. This method will NOT download a device if it is not stored in the cache.
+        /// </summary>
+        /// <param name="identifier">The identifier of the device to search for.</param>
+        /// <returns>The found device. <c>null</c> if no device with the supplied identifier exists in the cache.</returns>
+        public Device GetDevice(string identifier)
+        {
+            return Devices.FirstOrDefault(a => a.Identifier == identifier);
+        }
 
         /// <summary>
         ///     This event is invoked when the client wishes to log a message. (i.e. an endpoint is invoked)
