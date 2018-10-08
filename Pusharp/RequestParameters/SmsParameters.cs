@@ -6,9 +6,11 @@ namespace Pusharp.RequestParameters
 {
     public class SmsParameters : BaseRequest
     {
-        [ModelProperty("type")] public string Type { get; set; } = "push";
+        [ModelProperty("type")]
+        public string Type { get; set; } = "push";
 
-        [ModelProperty("push")] public Push Push { get; set; }
+        [ModelProperty("push")]
+        public Push Push { get; set; }
 
         internal override void VerifyParameters(ParameterBuilder builder)
         {
@@ -26,15 +28,20 @@ namespace Pusharp.RequestParameters
 
     public class Push
     {
-        [ModelProperty("conversation_iden")] public string ConversationIdentifier { get; set; }
+        [ModelProperty("conversation_iden")]
+        public string ConversationIdentifier { get; set; }
 
-        [ModelProperty("message")] public string Message { get; set; }
+        [ModelProperty("message")]
+        public string Message { get; set; }
 
-        [ModelProperty("target_device_iden")] public string DeviceIdentifier { get; set; }
+        [ModelProperty("target_device_iden")]
+        public string DeviceIdentifier { get; set; }
 
-        [ModelProperty("type")] public string Type { get; set; } = "messaging_extension_reply";
+        [ModelProperty("type")]
+        public string Type { get; set; } = "messaging_extension_reply";
 
-        [ModelProperty("package_name")] public string PackageName { get; set; } = "com.pushbullet.android";
+        [ModelProperty("package_name")]
+        public string PackageName { get; set; } = "com.pushbullet.android";
 
         [ModelProperty("source_user_identifier")]
         public string UserIdentifier { get; set; }
