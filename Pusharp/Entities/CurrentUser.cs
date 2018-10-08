@@ -1,4 +1,5 @@
 ﻿using System;
+using Pusharp.Utilities;
 using Model = Pusharp.Models.CurrentUserModel;
 
 namespace Pusharp.Entities

@@ -1,4 +1,5 @@
 ﻿using System;
+using Pusharp.Utilities;
 using Model = Pusharp.Models.DeviceModel;
 
 namespace Pusharp.Entities

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Pusharp.Entities;
 using Pusharp.Models;
 using Pusharp.RequestParameters;
+using System.Collections.Immutable;
 
 namespace Pusharp
 {
@@ -18,7 +19,7 @@ namespace Pusharp
         public async Task<IReadOnlyCollection<Device>> GetDevicesAsync()
         {
             var devicesModel = await _requests.SendAsync<DevicesModel>("/v2/devices", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
-            return devicesModel.Models.ToDevices().ToList();
+            return devicesModel.Models.Select(a => new Device(a)).ToImmutableList();
         }
 
         /// <summary>
