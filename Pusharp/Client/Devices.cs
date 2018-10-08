@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Pusharp.Entities;
@@ -21,25 +22,8 @@ namespace Pusharp
         {
             var devicesModel = await RequestClient.SendAsync<DevicesModel>("/devices", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
             var downloadedDevices = devicesModel.Models;
-            var finalList = new List<Device>();
 
-            foreach (var device in downloadedDevices)
-            {
-                var cached = GetDevice(device.Iden);
-                if (cached == null)
-                {
-                    var newDevice = new Device(device, this);
-                    Devices.Add(newDevice);
-                    finalList.Add(newDevice);
-                }
-                else
-                {
-                    cached.Update(device);
-                    finalList.Add(cached);
-                }
-            }
-
-            return finalList.ToImmutableList();
+            return downloadedDevices.Select(x => new Device(x, this)).ToImmutableList();
         }
 
         /// <summary>
@@ -54,7 +38,7 @@ namespace Pusharp
         {
             var deviceModel = await RequestClient.SendAsync<DeviceModel>("/devices", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
             var device = new Device(deviceModel, RequestClient.Client);
-            Devices.Add(device);
+            //Devices.Add(device);
             return device;
         }
     }

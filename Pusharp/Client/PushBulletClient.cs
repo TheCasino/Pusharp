@@ -28,6 +28,7 @@ namespace Pusharp
         /// </summary>
         public CurrentUser CurrentUser { get; }
 
+        /*
         internal List<Device> Devices { get; } = new List<Device>();
 
         /// <summary>
@@ -39,6 +40,7 @@ namespace Pusharp
         {
             return Devices.FirstOrDefault(a => a.Identifier == identifier);
         }
+        */
 
         /// <summary>
         ///     This event is invoked when the client wishes to log a message. (i.e. an endpoint is invoked)
