@@ -47,7 +47,7 @@ namespace Pusharp
             if(!ping.IsHappy)
                 throw new Exception($"{ping.Cat} The ping request is not happy!");
 
-            var authentication = await requests.SendAsync<CurrentUserModel>("/v2/users/me", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
+            var authentication = await requests.SendAsync<CurrentUserModel>("/users/me", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
 
             return new PushBulletClient(requests, authentication);
 
