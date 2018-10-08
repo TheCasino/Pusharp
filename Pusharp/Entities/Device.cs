@@ -51,8 +51,8 @@ namespace Pusharp.Entities
             SmsEnabled = model.HasSms;
             MmsEnabled = model.HasMms;
             AppVersion = model.AppVersion;
-            Created = model.Created.ToDateTime();
-            Modified = model.Modified.ToDateTime();
+            Created = DateTimeHelpers.ToDateTime(model.Created);
+            Modified = DateTimeHelpers.ToDateTime(model.Modified);
             Identifier = model.Iden;
             Manufacturer = model.Manufacturer;
             Model = model.Model;

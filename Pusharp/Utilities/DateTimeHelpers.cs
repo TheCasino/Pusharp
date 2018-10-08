@@ -2,14 +2,14 @@
 
 namespace Pusharp.Utilities
 {
-    internal static class DateTimeOffsetExtensions
+    internal static class DateTimeHelpers
     {
-        public static DateTimeOffset ToDateTime(this double time)
+        public static DateTimeOffset ToDateTime(double time)
         {
             return ToDateTime((long) time);
         }
 
-        public static DateTimeOffset ToDateTime(this long time)
+        public static DateTimeOffset ToDateTime(long time)
         {
             return DateTimeOffset.FromUnixTimeMilliseconds(time);
         }

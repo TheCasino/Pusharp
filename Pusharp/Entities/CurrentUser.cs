@@ -25,7 +25,7 @@ namespace Pusharp.Entities
 
         public Uri ImageUrl => new Uri(_model.ImageUrl);
 
-        public DateTimeOffset Created => _model.Created.ToDateTime();
-        public DateTimeOffset Modified => _model.Created.ToDateTime();
+        public DateTimeOffset Created => DateTimeHelpers.ToDateTime(_model.Created);
+        public DateTimeOffset Modified => DateTimeHelpers.ToDateTime(_model.Created);
     }
 }
