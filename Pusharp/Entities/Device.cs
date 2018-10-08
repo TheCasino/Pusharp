@@ -84,6 +84,6 @@ namespace Pusharp.Entities
         ///     Deletes this device from the Pushbullet service.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous delete operation.</returns>
-        public async Task DeleteAsync() => await _client.Requests.SendAsync<EmptyModel>($"/devices/{Identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
+        public async Task DeleteAsync() => await _client.Requests.SendAsync($"/devices/{Identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
     }
 }

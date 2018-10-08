@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Pusharp.Models;
 using Pusharp.Utilities;
 using Voltaic.Serialization.Json;
 
@@ -51,8 +52,12 @@ namespace Pusharp
             _semaphore = new SemaphoreSlim(1, 1);
         }
 
+        public Task SendAsync(string endpoint) => SendAsync<EmptyModel>(endpoint);
+
         public Task<T> SendAsync<T>(string endpoint)
             => SendAsync<T>(endpoint, HttpMethod.Get, false, 0, null);
+
+        public Task SendAsync(string endpoint, HttpMethod method, bool isDatabaseRequest, int hits, BaseRequest parameters) => SendAsync<EmptyModel>(endpoint, method, isDatabaseRequest, hits, parameters);
 
         public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, bool isDatabaseRequest, int hits, BaseRequest parameters)
         {
