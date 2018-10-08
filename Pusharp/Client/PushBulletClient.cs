@@ -17,18 +17,18 @@ namespace Pusharp
         /// </summary>
         public event Func<LogMessage, Task> Log;
 
-        internal readonly Requests Requests;
+        internal readonly RequestClient RequestClient;
 
         /// <summary>
         ///     The current user that is logged into this client.
         /// </summary>
         public CurrentUser CurrentUser { get; }
 
-        private PushBulletClient(Requests requests, CurrentUserModel model)
+        private PushBulletClient(RequestClient requestClient, CurrentUserModel model)
         {
-            Requests = requests;
+            RequestClient = requestClient;
             CurrentUser = new CurrentUser(model);
-            Requests.Client = this;
+            RequestClient.Client = this;
         }
 
         internal Task InternalLogAsync(LogMessage message)
@@ -47,7 +47,7 @@ namespace Pusharp
         {
             config = config ?? new PushBulletClientConfig();
 
-            var requests = new Requests(accessToken, config);
+            var requests = new RequestClient(accessToken, config);
             var ping = await requests.SendAsync<PingModel>(string.Empty).ConfigureAwait(false);
 
             if(!ping.IsHappy)

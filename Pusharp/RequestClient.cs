@@ -13,7 +13,7 @@ using Voltaic.Serialization.Json;
 
 namespace Pusharp
 {
-    internal class Requests
+    internal class RequestClient
     {
         public const int FreeAccountPushLimit = 500; // Pushbullet Free accounts are limited to 500 pushes per month.
 
@@ -38,7 +38,7 @@ namespace Pusharp
 
         private DateTimeOffset RateLimitReset => DateTimeOffset.FromUnixTimeSeconds(long.TryParse(_rateLimitReset, out var seconds) ? seconds : 0);
 
-        public Requests(string accessToken, PushBulletClientConfig config)
+        public RequestClient(string accessToken, PushBulletClientConfig config)
         {
             _http = new HttpClient
             {

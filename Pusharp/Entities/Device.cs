@@ -76,7 +76,7 @@ namespace Pusharp.Entities
             var parameters = new DeviceParameters();
             parameterOperator(parameters);
 
-            var result = await _client.Requests.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
+            var result = await _client.RequestClient.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
             Update(result);
         }
 
@@ -84,6 +84,6 @@ namespace Pusharp.Entities
         ///     Deletes this device from the Pushbullet service.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous delete operation.</returns>
-        public async Task DeleteAsync() => await _client.Requests.SendAsync($"/devices/{Identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
+        public async Task DeleteAsync() => await _client.RequestClient.SendAsync($"/devices/{Identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
     }
 }
