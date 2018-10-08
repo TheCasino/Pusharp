@@ -4,8 +4,8 @@ namespace Pusharp.RequestParameters
 {
     public abstract class BaseRequest
     {
-        public abstract bool VerifyParameters();
+        internal abstract bool VerifyParameters();
 
-        public abstract string BuildContent(JsonSerializer serializer);
+        internal abstract string BuildContent(JsonSerializer serializer);
     }
 }

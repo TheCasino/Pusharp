@@ -12,12 +12,12 @@ namespace Pusharp.RequestParameters
         [ModelProperty("push")]
         public Push Push { get; set; }
 
-        public override bool VerifyParameters()
+        internal override bool VerifyParameters()
         {
             throw new NotImplementedException();
         }
 
-        public override string BuildContent(JsonSerializer serializer)
+        internal override string BuildContent(JsonSerializer serializer)
             => serializer.WriteUtf16String(this);
     }
 

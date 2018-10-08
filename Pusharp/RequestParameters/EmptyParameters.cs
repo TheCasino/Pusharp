@@ -6,10 +6,10 @@ namespace Pusharp.RequestParameters
     {
         private EmptyParameters() { }
 
-        public override bool VerifyParameters()
+        internal override bool VerifyParameters()
             => true;
 
-        public override string BuildContent(JsonSerializer _)
+        internal override string BuildContent(JsonSerializer _)
             => string.Empty;
 
         public static EmptyParameters Create()
