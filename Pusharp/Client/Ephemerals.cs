@@ -14,7 +14,7 @@ namespace Pusharp
         /// <returns>A <see cref="Task" /> representing the asynchronous send operation.</returns>
         public async Task SendSmsAsync(SmsParameters parameters)
         {
-            await RequestClient.SendAsync("/v2/ephemerals", HttpMethod.Post, true, 1, parameters)
+            await RequestClient.SendAsync("/v2/ephemerals", HttpMethod.Post, parameters)
                 .ConfigureAwait(false);
         }
 

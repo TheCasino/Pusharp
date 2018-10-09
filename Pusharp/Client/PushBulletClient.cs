@@ -42,12 +42,7 @@ namespace Pusharp
 
         public async Task AuthenticateAsync()
         {
-            var ping = await RequestClient.SendAsync<PingModel>(string.Empty).ConfigureAwait(false);
-
-            if(!ping.IsHappy)
-                throw new Exception($"{ping.Cat} the ping request is not happy");
-
-            var authentication = await RequestClient.SendAsync<CurrentUserModel>("/v2/users/me", HttpMethod.Get, true, 1, null).ConfigureAwait(false);
+            var authentication = await RequestClient.SendAsync<CurrentUserModel>("/v2/users/me", HttpMethod.Get, null).ConfigureAwait(false);
             CurrentUser = new CurrentUser(authentication);
         }
     }

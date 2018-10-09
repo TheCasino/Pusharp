@@ -50,7 +50,7 @@ namespace Pusharp.Entities
             var parameters = new DeviceParameters();
             parameterOperator(parameters);
 
-            var result = await _client.RequestClient.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Post, true, 1, parameters).ConfigureAwait(false);
+            var result = await _client.RequestClient.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Post, parameters).ConfigureAwait(false);
             _model = result;
         }
 
@@ -60,10 +60,11 @@ namespace Pusharp.Entities
         /// <returns>A <see cref="Task" /> representing the asynchronous delete operation.</returns>
         public async Task DeleteAsync()
         {
+            //Change to not throw
             if(!IsActive)
                 throw new Exception("Device must be active");
 
-            await _client.RequestClient.SendAsync($"/devices/{Identifier}", HttpMethod.Delete, true, 1, null).ConfigureAwait(false);
+            await _client.RequestClient.SendAsync($"/devices/{Identifier}", HttpMethod.Delete, null).ConfigureAwait(false);
         }
     }
 }

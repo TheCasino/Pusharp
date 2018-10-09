@@ -29,9 +29,7 @@ namespace Pusharp
 
         private string _rateLimit;
         private string _rateLimitReset;
-
-        //default to 1 because the initial ping doesn't use a request
-        private string _remaining = "1";
+        private string _remaining;
 
         public RequestClient(PushBulletClientConfig config, PushBulletClient client)
         {
@@ -54,34 +52,25 @@ namespace Pusharp
 
         private DateTimeOffset RateLimitReset => DateTimeOffset.FromUnixTimeSeconds(long.TryParse(_rateLimitReset, out var seconds) ? seconds : 0);
         
-        public Task<T> SendAsync<T>(string endpoint)
+        public Task SendAsync(string endpoint, HttpMethod method, BaseRequest parameters)
         {
-            return SendAsync<T>(endpoint, HttpMethod.Get, false, 0, null);
+            return SendAsync<EmptyModel>(endpoint, method, parameters);
         }
 
-        public Task SendAsync(string endpoint, HttpMethod method, bool isDatabaseRequest, int hits, BaseRequest parameters)
-        {
-            return SendAsync<EmptyModel>(endpoint, method, isDatabaseRequest, hits, parameters);
-        }
-
-        public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, bool isDatabaseRequest, int hits, BaseRequest parameters)
+        public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, BaseRequest parameters)
         {
             await _semaphore.WaitAsync().ConfigureAwait(false);
 
             try
             {
-                if (CalculateCost(isDatabaseRequest, hits) > Remaining)
-                {
-                    _semaphore.Release();
-                    throw new RatelimitedException(method, endpoint, Remaining);
-                }
-
                 var request = new HttpRequestMessage(method, endpoint);
                 parameters = parameters ?? EmptyParameters.Create();
 
+                /* Needs changing to not throw
                 var builder = new ParameterBuilder();
                 parameters.VerifyParameters(builder);
                 builder.ValidateParameters();
+                */
 
                 request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8,
                     "application/json");
@@ -90,23 +79,18 @@ namespace Pusharp
                 {
                     requestTime.Stop();
 
-                    await _client.InternalLogAsync(new LogMessage(LogLevel.Verbose, $"{method} {endpoint}: {requestTime.ElapsedMilliseconds}ms"));
+                    await _client.InternalLogAsync(new LogMessage(LogLevel.Verbose, $"{method} {endpoint}: {requestTime.ElapsedMilliseconds}ms")).ConfigureAwait(false);
 
                     ParseResponseHeaders(response);
 
                     return await HandleResponseAsync<T>(response).ConfigureAwait(false);
                 }
             }
-            catch (RatelimitedException exception)
+            catch (Exception exception)
             {
                 await _client.InternalLogAsync(new LogMessage(LogLevel.Error, exception.ToString()));
-                throw;
+                return default;
             }
-        }
-
-        private static int CalculateCost(bool isDatabaseRequest, int hits = 0)
-        {
-            return 1 + (isDatabaseRequest ? 4 : 0) * hits;
         }
 
         private void ParseResponseHeaders(HttpResponseMessage message)
