@@ -3,6 +3,7 @@ using Pusharp.Utilities;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Pusharp.Models;
 using Model = Pusharp.Models.DeviceModel;
 
 namespace Pusharp.Entities
@@ -31,11 +32,11 @@ namespace Pusharp.Entities
 
         public string Identifier => _model.Iden;
         public string Manufacturer => _model.Manufacturer;
-        public string Model => _model.Model;
+        public string Model => _model.Model; //TODO enum
         public string Nickname => _model.Nickname;
         public string PushToken => _model.PushToken;
-        public string Type => _model.Type;
-        public string Kind => _model.Kind;
+        public string Type => _model.Type; //TODO enum
+        public string Kind => _model.Kind; //TODO enum
         public string Fingerprint => _model.Fingerprint;
         public string KeyFingerprint => _model.KeyFingerprint;
         public string Icon => _model.Icon;
@@ -50,7 +51,9 @@ namespace Pusharp.Entities
             var parameters = new DeviceParameters();
             parameterOperator(parameters);
 
-            var result = await _client.RequestClient.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Post, parameters).ConfigureAwait(false);
+            var result = await _client.RequestClient.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Post, parameters)
+                .ConfigureAwait(false);
+
             _model = result;
         }
 
@@ -60,11 +63,18 @@ namespace Pusharp.Entities
         /// <returns>A <see cref="Task" /> representing the asynchronous delete operation.</returns>
         public async Task DeleteAsync()
         {
-            //Change to not throw
-            if(!IsActive)
-                throw new Exception("Device must be active");
+            if (!IsActive)
+            {
+                await _client.InternalLogAsync(new LogMessage(LogLevel.Error, "Only active devices can be deleted"))
+                    .ConfigureAwait(false);
+                    
+                return;
+            }
 
-            await _client.RequestClient.SendAsync($"/devices/{Identifier}", HttpMethod.Delete, null).ConfigureAwait(false);
+            var model = await _client.RequestClient.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Delete, null)
+                .ConfigureAwait(false);
+
+            _model = model;
         }
     }
 }

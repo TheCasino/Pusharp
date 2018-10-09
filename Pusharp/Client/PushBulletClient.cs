@@ -23,8 +23,7 @@ namespace Pusharp
         /// </summary>
         public CurrentUser CurrentUser { get; private set; }
 
-        //public delegate void LogEvent(LogMessage message);
-
+        //TODO move events to their own class
         /// <summary>
         ///     This event is invoked when the client wishes to log a message. (i.e. an endpoint is invoked)
         /// </summary>

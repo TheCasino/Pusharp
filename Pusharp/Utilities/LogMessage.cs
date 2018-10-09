@@ -2,6 +2,8 @@ namespace Pusharp.Utilities
 {
     public class LogMessage
     {
+        //TODO LogSource + LogHandler class -> filter logs by level
+
         public LogMessage(LogLevel level, string message)
         {
             Message = message;
