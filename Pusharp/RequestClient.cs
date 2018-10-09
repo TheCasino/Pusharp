@@ -31,7 +31,7 @@ namespace Pusharp
         private string _rateLimitReset;
         private string _remaining;
 
-        public RequestClient(PushBulletClientConfig config, PushBulletClient client)
+        public RequestClient(PushBulletClient client, PushBulletClientConfig config, JsonSerializer serializer)
         {
             _client = client;
 
@@ -43,7 +43,7 @@ namespace Pusharp
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _http.DefaultRequestHeaders.Add("Access-Token", config.Token);
 
-            _serializer = new JsonSerializer();
+            _serializer = serializer;
             _semaphore = new SemaphoreSlim(1, 1);
         }
 
@@ -74,6 +74,7 @@ namespace Pusharp
 
                 request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8,
                     "application/json");
+
                 var requestTime = Stopwatch.StartNew();
                 using (var response = await _http.SendAsync(request).ConfigureAwait(false))
                 {

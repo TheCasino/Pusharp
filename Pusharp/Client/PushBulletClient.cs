@@ -1,10 +1,11 @@
+using Pusharp.Entities;
+using Pusharp.Utilities;
 using System;
 using System.Data;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Pusharp.Entities;
 using Pusharp.Models;
-using Pusharp.Utilities;
+using Voltaic.Serialization.Json;
 
 namespace Pusharp
 {
@@ -13,8 +14,10 @@ namespace Pusharp
     /// </summary>
     public partial class PushBulletClient
     {
-        internal readonly RequestClient RequestClient;
+        private readonly PushBulletClientConfig _config;
+        private readonly JsonSerializer _serializer;
 
+        internal readonly RequestClient RequestClient;
         /// <summary>
         ///     The current user that is logged into this client.
         /// </summary>
@@ -37,13 +40,19 @@ namespace Pusharp
             if(string.IsNullOrWhiteSpace(config.Token))
                 throw new NoNullAllowedException("Token can't be null or empty");
 
-            RequestClient = new RequestClient(config, this);
+            _config = config;
+            _serializer = new JsonSerializer();
+
+            RequestClient = new RequestClient(this, _config, _serializer);
         }
 
-        public async Task AuthenticateAsync()
+        public async Task ConnectAsync()
         {
             var authentication = await RequestClient.SendAsync<CurrentUserModel>("/v2/users/me", HttpMethod.Get, null).ConfigureAwait(false);
             CurrentUser = new CurrentUser(authentication);
+
+            var socket = new WebSocket(this, _config, _serializer);
+            socket.Connect();
         }
     }
 }
