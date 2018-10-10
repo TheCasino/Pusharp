@@ -42,9 +42,9 @@ namespace Pusharp.Entities
 
         private async Task ModifyAsync(bool isMuted)
         {
-            var model = await _client.RequestClient.SendAsync<Model>("/v2/chats", HttpMethod.Post, new ChatParameters
+            var model = await _client.RequestClient.SendAsync<Model>("/v2/chats", HttpMethod.Post, new MutedParameter
             {
-                Muted = isMuted
+                IsMuted = isMuted
             }).ConfigureAwait(false);
 
             _model = model;
