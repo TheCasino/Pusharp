@@ -3,7 +3,6 @@ using Pusharp.Utilities;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Pusharp.Models;
 using Model = Pusharp.Models.DeviceModel;
 
 namespace Pusharp.Entities

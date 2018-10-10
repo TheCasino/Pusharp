@@ -27,6 +27,7 @@ namespace Pusharp.Entities
         internal Chat(Model model, PushBulletClient client)
         {
             _model = model;
+            _client = client;
         }
 
         public Task MuteAsync()
