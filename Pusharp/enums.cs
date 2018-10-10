@@ -23,4 +23,18 @@
         PUSH,
         DEVICE
     }
+
+    public enum PushDirection
+    {
+        Self,
+        Outgoing,
+        Incoming
+    }
+
+    public enum PushType
+    {
+        Note,
+        Link,
+        File
+    }
 }

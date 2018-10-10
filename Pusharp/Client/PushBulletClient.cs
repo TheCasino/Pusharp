@@ -48,7 +48,7 @@ namespace Pusharp
         public async Task ConnectAsync()
         {
             var authentication = await RequestClient.SendAsync<CurrentUserModel>("/v2/users/me", HttpMethod.Get, null).ConfigureAwait(false);
-            CurrentUser = new CurrentUser(authentication);
+            CurrentUser = new CurrentUser(authentication, RequestClient);
 
             var socket = new WebSocket(this, _config, _serializer);
             socket.Connect();

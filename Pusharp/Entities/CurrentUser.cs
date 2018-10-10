@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Pusharp.Utilities;
 using Model = Pusharp.Models.CurrentUserModel;
 
@@ -7,11 +9,7 @@ namespace Pusharp.Entities
     public class CurrentUser
     {
         private readonly Model _model;
-
-        internal CurrentUser(Model model)
-        {
-            _model = model;
-        }
+        private readonly RequestClient _client;
 
         public bool IsActive => _model.Active;
 
@@ -27,5 +25,16 @@ namespace Pusharp.Entities
 
         public DateTimeOffset Created => DateTimeHelpers.ToDateTime(_model.Created);
         public DateTimeOffset Modified => DateTimeHelpers.ToDateTime(_model.Created);
+
+        internal CurrentUser(Model model, RequestClient client)
+        {
+            _model = model;
+            _client = client;
+        }
+
+        public async Task DeleteAllPushesAsync()
+        {
+            await _client.SendAsync("/v2/pushes", HttpMethod.Delete, null).ConfigureAwait(false);
+        }
     }
 }
