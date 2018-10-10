@@ -3,7 +3,7 @@ using Voltaic.Serialization.Json;
 
 namespace Pusharp.RequestParameters
 {
-    internal class EmptyParameters : BaseRequest
+    internal class EmptyParameters : ParametersBase
     {
         private EmptyParameters()
         {

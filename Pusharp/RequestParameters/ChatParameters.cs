@@ -4,13 +4,10 @@ using Voltaic.Serialization.Json;
 
 namespace Pusharp.RequestParameters
 {
-    public class ChatParameters : BaseRequest
+    public class ChatParameters : ParametersBase
     {
         [ModelProperty("email")]
         public string Email { get; set; }
-
-        [ModelProperty("muted")]
-        internal bool Muted { get; set; }
 
         internal override void VerifyParameters(ParameterBuilder builder)
         {

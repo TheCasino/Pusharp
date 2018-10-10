@@ -4,7 +4,7 @@ using Voltaic.Serialization.Json;
 
 namespace Pusharp.RequestParameters
 {
-    internal class DismissPush : BaseRequest
+    internal class DismissPush : ParametersBase
     {
         [ModelProperty("dismissed")]
         public bool Dismissed { get; set; }

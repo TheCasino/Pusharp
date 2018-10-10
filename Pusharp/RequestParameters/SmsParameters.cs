@@ -4,7 +4,7 @@ using Voltaic.Serialization.Json;
 
 namespace Pusharp.RequestParameters
 {
-    public class SmsParameters : BaseRequest
+    public class SmsParameters : ParametersBase
     {
         [ModelProperty("type")]
         public string Type { get; set; } = "push";

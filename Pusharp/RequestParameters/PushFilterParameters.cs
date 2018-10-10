@@ -4,7 +4,7 @@ using Voltaic.Serialization.Json;
 
 namespace Pusharp.RequestParameters
 {
-    public class PushFilterParameters : BaseRequest
+    public class PushFilterParameters : ParametersBase
     {
         [ModelProperty("modified_after")]
         public string ModifiedAfter { get; set; }

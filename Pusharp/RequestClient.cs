@@ -52,12 +52,12 @@ namespace Pusharp
 
         private DateTimeOffset RateLimitReset => DateTimeOffset.FromUnixTimeSeconds(long.TryParse(_rateLimitReset, out var seconds) ? seconds : 0);
         
-        public Task SendAsync(string endpoint, HttpMethod method, BaseRequest parameters)
+        public Task SendAsync(string endpoint, HttpMethod method, ParametersBase parameters)
         {
             return SendAsync<EmptyModel>(endpoint, method, parameters);
         }
 
-        public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, BaseRequest parameters)
+        public async Task<T> SendAsync<T>(string endpoint, HttpMethod method, ParametersBase parameters)
         {
             await _semaphore.WaitAsync().ConfigureAwait(false);
 

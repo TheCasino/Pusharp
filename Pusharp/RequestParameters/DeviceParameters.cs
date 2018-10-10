@@ -4,7 +4,7 @@ using Voltaic.Serialization.Json;
 
 namespace Pusharp.RequestParameters
 {
-    public class DeviceParameters : BaseRequest
+    public class DeviceParameters : ParametersBase
     {
         [ModelProperty("nickname")]
         public string Nickname { get; set; }
