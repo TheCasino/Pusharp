@@ -5,6 +5,8 @@ namespace Pusharp.RequestParameters
 {
     public abstract class ParametersBase
     {
+        internal virtual string Encoding { get; set; } = "application/json";
+
         //maybe make exposed so user can check before sending request
         internal abstract void VerifyParameters(ParameterBuilder builder);
 

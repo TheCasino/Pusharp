@@ -2,6 +2,7 @@ using Pusharp.Models;
 using Pusharp.RequestParameters;
 using Pusharp.Utilities;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -73,7 +74,7 @@ namespace Pusharp
                 */
 
                 request.Content = new StringContent(parameters.BuildContent(_serializer), Encoding.UTF8,
-                    "application/json");
+                    parameters.Encoding);
 
                 var requestTime = Stopwatch.StartNew();
                 using (var response = await _http.SendAsync(request).ConfigureAwait(false))
