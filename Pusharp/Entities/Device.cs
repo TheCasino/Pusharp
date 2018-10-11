@@ -3,18 +3,23 @@ using Pusharp.Utilities;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Pusharp.Models;
+using Voltaic;
+using Voltaic.Serialization.Json;
 using Model = Pusharp.Models.DeviceModel;
 
 namespace Pusharp.Entities
 {
     public class Device
     {
-        private readonly PushBulletClient _client;
         private Model _model;
+        private readonly JsonSerializer _serializer;
+        private readonly PushBulletClient _client;
 
-        internal Device(Model model, PushBulletClient client)
+        internal Device(Model model, JsonSerializer serializer, PushBulletClient client)
         {
             _model = model;
+            _serializer = serializer;
             _client = client;
         }
 
@@ -74,6 +79,18 @@ namespace Pusharp.Entities
                 .ConfigureAwait(false);
 
             _model = model;
+        }
+
+        public async Task<Push> SendPushAsync(DevicePushParameters parameters)
+        {
+            //kinda hacky... Can't think of a better way to do it though
+            var serialized = parameters.BuildContent(_serializer);
+            var pushParameters = _serializer.ReadUtf8<PushParameters>(new Utf8String(serialized));
+            pushParameters.DeviceIdentifier = Identifier;
+
+            var push = await _client.SendPushAsync(pushParameters).ConfigureAwait(false);
+
+            return push;
         }
     }
 }

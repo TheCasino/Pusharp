@@ -23,7 +23,7 @@ namespace Pusharp
             var devicesModel = await RequestClient.SendAsync<DevicesModel>("/v2/devices", HttpMethod.Get, null).ConfigureAwait(false);
             var downloadedDevices = devicesModel.Models;
 
-            return downloadedDevices.Select(x => new Device(x, this)).ToImmutableList();
+            return downloadedDevices.Select(x => new Device(x, _serializer, this)).ToImmutableList();
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Pusharp
         public async Task<Device> CreateDeviceAsync(DeviceParameters parameters)
         {
             var deviceModel = await RequestClient.SendAsync<DeviceModel>("/v2/devices", HttpMethod.Post, parameters).ConfigureAwait(false);
-            var device = new Device(deviceModel, this);
+            var device = new Device(deviceModel, _serializer, this);
             return device;
         }
     }
