@@ -1,10 +1,8 @@
 using Pusharp.Entities;
-using Pusharp.Utilities;
-using System;
+using Pusharp.Models;
 using System.Data;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Pusharp.Models;
 using Voltaic.Serialization.Json;
 
 namespace Pusharp
@@ -23,17 +21,6 @@ namespace Pusharp
         /// </summary>
         public CurrentUser CurrentUser { get; private set; }
 
-        //TODO move events to their own class
-        /// <summary>
-        ///     This event is invoked when the client wishes to log a message. (i.e. an endpoint is invoked)
-        /// </summary>
-        public event Func<LogMessage, Task> Log; 
-
-        internal Task InternalLogAsync(LogMessage message)
-        {
-            return Log is null ? Task.CompletedTask : Log.Invoke(message);
-        }
-        
         public PushBulletClient(PushBulletClientConfig config)
         {
             if(string.IsNullOrWhiteSpace(config.Token))

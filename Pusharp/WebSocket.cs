@@ -3,6 +3,7 @@ using Pusharp.Entities.WebSocket;
 using Pusharp.Models.WebSocket;
 using Pusharp.Utilities;
 using System;
+using System.Net.Http.Headers;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Voltaic;
@@ -87,8 +88,37 @@ namespace Pusharp
 
             var message = new WebSocketMessage(model);
 
-            if (message.Type == MessageType.HEARTBEAT)
-                _client.InternalLogAsync(new LogMessage(LogLevel.Debug, "Heartbeat received"));
+            switch (message.Type)
+            {
+                case MessageType.HEARTBEAT:
+                    _client.InternalLogAsync(new LogMessage(LogLevel.Debug, "Heartbeat received"));
+                    break;
+                case MessageType.PUSH:
+                    _client.InternalLogAsync(new LogMessage(LogLevel.Debug, "Push received"));
+
+                    switch (message.ReceivedModel.Type)
+                    {
+                        case "mirror":
+                            _client.InternalLogAsync(new LogMessage(LogLevel.Debug, "Mirror push"));
+                            _client.InternalPushReceivedAsync(new ReceivedPush(message.ReceivedModel));
+                            break;
+
+                        case "dismissal":
+                            _client.InternalLogAsync(new LogMessage(LogLevel.Debug, "Dismissed push"));
+                            _client.InternalPushDismissedAsync(new DismissedPush(message.ReceivedModel));
+                            break;
+                    }
+
+
+                    break;
+
+                case MessageType.TICKLE:
+                    _client.InternalLogAsync(new LogMessage(LogLevel.Debug, "Tickle received"));
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(message.Type));
+            }
         }
 
         private void StateChanged(WebSocketState newState, WebSocketState prevState)

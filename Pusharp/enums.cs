@@ -37,4 +37,10 @@
         Link,
         File
     }
+
+    public enum ReceivedPushType
+    {
+        Mirror,
+        Dismissal
+    }
 }

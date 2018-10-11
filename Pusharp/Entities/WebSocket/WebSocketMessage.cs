@@ -1,4 +1,5 @@
 ﻿using System;
+using Pusharp.Models.WebSocket;
 using Model = Pusharp.Models.WebSocket.MessageReceivedModel;
 
 namespace Pusharp.Entities.WebSocket
@@ -58,6 +59,8 @@ namespace Pusharp.Entities.WebSocket
                 }
             }
         }
+
+        public PushReceivedModel ReceivedModel => _model.Push;
 
         public WebSocketMessage(Model model)
         {
