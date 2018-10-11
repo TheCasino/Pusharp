@@ -30,5 +30,11 @@ namespace Pusharp.Models
 
         [ModelProperty("name")]
         public string Name { get; set; }
+
+        [ModelProperty("referred_count")]
+        public int ReferredCount { get; set; }
+
+        [ModelProperty("referrer_iden")]
+        public string ReferrerIdentifier { get; set; }
     }
 }

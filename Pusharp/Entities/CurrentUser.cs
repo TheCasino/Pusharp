@@ -17,6 +17,9 @@ namespace Pusharp.Entities
         public string Identifier => _model.Iden;
         public string Email => _model.Email;
         public string NormalizedEmail => _model.EmailNormalized;
+        public string ReferrerIdentifier => _model.ReferrerIdentifier;
+
+        public int ReferredCount => _model.ReferredCount;
 
         //TODO parse this 'better'
         public long MaxUploadSize => _model.MaxUploadSize;
