@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Pusharp.Entities;
 using Pusharp.Models;
@@ -8,8 +9,11 @@ namespace Pusharp
 {
     public partial class PushBulletClient
     {
-        public async Task<UploadRequest> CreateUploadRequestAsync(UploadRequestParameters parameters)
+        public async Task<UploadRequest> CreateUploadRequestAsync(Action<UploadRequestParameters> uploadRequestParameters)
         {
+            var parameters = new UploadRequestParameters();
+            uploadRequestParameters(parameters);
+
             var uploadModel = await RequestClient
                 .SendAsync<UploadRequestModel>("/v2/upload-request", HttpMethod.Post, parameters)
                 .ConfigureAwait(false);

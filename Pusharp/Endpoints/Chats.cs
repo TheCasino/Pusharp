@@ -20,6 +20,7 @@ namespace Pusharp
             return chatsList.ToImmutableList();
         }
 
+        //TODO ugly
         public Task<Chat> CreateChatAsync(string email)
         {
             return CreateChatAsync(new ChatParameters

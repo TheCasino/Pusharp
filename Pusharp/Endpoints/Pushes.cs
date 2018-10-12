@@ -1,4 +1,5 @@
-﻿using Pusharp.Entities;
+﻿using System;
+using Pusharp.Entities;
 using Pusharp.Models;
 using Pusharp.RequestParameters;
 using System.Collections.Generic;
@@ -11,8 +12,11 @@ namespace Pusharp
 {
     public partial class PushBulletClient
     {
-        public async Task<IReadOnlyCollection<Push>> GetPushesAsync(PushFilterParameters parameters)
+        public async Task<IReadOnlyCollection<Push>> GetPushesAsync(Action<PushFilterParameters> pushFilterParameters)
         {
+            var parameters = new PushFilterParameters();
+            pushFilterParameters(parameters);
+
             var pushesModel = await RequestClient.SendAsync<PushesModel>("/v2/pushes", HttpMethod.Get, parameters)
                 .ConfigureAwait(false);
             
@@ -21,18 +25,27 @@ namespace Pusharp
             return pushes.ToImmutableList();
         }
 
-        public Task<Push> EmailNoteAsync(NotePushParameters parameters, string email)
+        public Task<Push> EmailNoteAsync(Action<NotePushParameters> notePushParameters, string email)
         {
+            var parameters = new NotePushParameters();
+            notePushParameters(parameters);
+
             return PushNoteAsync(parameters, PushTarget.Email, email);
         }
 
-        public Task<Push> EmailLinkAsync(LinkPushParameters parameters, string email)
+        public Task<Push> EmailLinkAsync(Action<LinkPushParameters> linkPushParameters, string email)
         {
+            var parameters = new LinkPushParameters();
+            linkPushParameters(parameters);
+
             return PushLinkAsync(parameters, PushTarget.Email, email);
         }
 
-        public Task<Push> EmailFileAsync(FilePushParameters parameters, string email)
+        public Task<Push> EmailFileAsync(Action<FilePushParameters> filePushParameters, string email)
         {
+            var parameters = new FilePushParameters();
+            filePushParameters(parameters);
+
             return PushFileAsync(parameters, PushTarget.Email, email);
         }
 

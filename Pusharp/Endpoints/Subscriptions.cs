@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
@@ -22,8 +23,11 @@ namespace Pusharp
             return subscriptions.ToImmutableList();
         }
 
-        public async Task<Subscription> CreateSubscriptionAsync(SubscriptionParameters parameters)
+        public async Task<Subscription> CreateSubscriptionAsync(Action<SubscriptionParameters> subscriptionParameters)
         {
+            var parameters = new SubscriptionParameters();
+            subscriptionParameters(parameters);
+
             var subscriptionModel = await RequestClient
                 .SendAsync<SubscriptionModel>("/v2/subscriptions", HttpMethod.Post, parameters)
                 .ConfigureAwait(false);
@@ -31,8 +35,11 @@ namespace Pusharp
             return new Subscription(subscriptionModel, this);
         }
 
-        public async Task<ChannelInfo> GetChannelInfoAsync(ChannelInfoParameters parameters)
+        public async Task<ChannelInfo> GetChannelInfoAsync(Action<ChannelInfoParameters> channelInfoParameters)
         {
+            var parameters = new ChannelInfoParameters();
+            channelInfoParameters(parameters);
+
             var channelInfoModel = await RequestClient
                 .SendAsync<ChannelInfoModel>("/v2/channel-info", HttpMethod.Get, parameters)
                 .ConfigureAwait(false);

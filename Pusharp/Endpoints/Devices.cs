@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
@@ -29,13 +30,16 @@ namespace Pusharp
         /// <summary>
         ///     Creates a device under the client's account.
         /// </summary>
-        /// <param name="parameters">The <see cref="DeviceParameters" /> to set up the new device with.</param>
+        /// <param name="deviceParameters">The <see cref="DeviceParameters" /> to set up the new device with.</param>
         /// <returns>
         ///     A <see cref="Task" /> representing the asynchronous post operation. This task will resolve with a
         ///     <see cref="Device" /> entity representing the created device.
         /// </returns>
-        public async Task<Device> CreateDeviceAsync(DeviceParameters parameters)
+        public async Task<Device> CreateDeviceAsync(Action<DeviceParameters> deviceParameters)
         {
+            var parameters = new DeviceParameters();
+            deviceParameters(parameters);
+
             var deviceModel = await RequestClient.SendAsync<DeviceModel>("/v2/devices", HttpMethod.Post, parameters).ConfigureAwait(false);
             var device = new Device(deviceModel, _serializer, this);
             return device;
