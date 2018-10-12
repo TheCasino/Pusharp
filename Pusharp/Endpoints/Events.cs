@@ -27,5 +27,12 @@ namespace Pusharp
         {
             PushDismissed?.Invoke(push);
         }
+
+        public event Func<ReceivedCopy, Task> CopyReceived;
+
+        internal void InternalCopyReceivedAsync(ReceivedCopy copy)
+        {
+            CopyReceived?.Invoke(copy);
+        }
     }
 }

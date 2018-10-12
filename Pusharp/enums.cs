@@ -41,6 +41,15 @@
     public enum ReceivedPushType
     {
         Mirror,
-        Dismissal
+        Dismissal,
+        Clip
+    }
+
+    public enum PushTarget
+    {
+        Device,
+        Email,
+        Channel,
+        Client
     }
 }

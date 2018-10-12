@@ -107,9 +107,12 @@ namespace Pusharp
                             _client.InternalLogAsync(new LogMessage(LogLevel.Debug, "Dismissed push"));
                             _client.InternalPushDismissedAsync(new DismissedPush(message.ReceivedModel));
                             break;
+
+                        case "clip":
+                            _client.InternalLogAsync(new LogMessage(LogLevel.Debug, "Copy received"));
+                            _client.InternalCopyReceivedAsync(new ReceivedCopy(message.ReceivedModel));
+                            break;
                     }
-
-
                     break;
 
                 case MessageType.TICKLE:
