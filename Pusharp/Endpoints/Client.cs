@@ -3,6 +3,7 @@ using Pusharp.Models;
 using System.Data;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Pusharp.Utilities;
 using Voltaic.Serialization.Json;
 
 namespace Pusharp
@@ -14,6 +15,7 @@ namespace Pusharp
     {
         private readonly PushBulletClientConfig _config;
         private readonly JsonSerializer _serializer;
+        private readonly Logger _logger;
 
         internal readonly RequestClient RequestClient;
         /// <summary>
@@ -28,8 +30,9 @@ namespace Pusharp
 
             _config = config;
             _serializer = new JsonSerializer();
+            _logger = new Logger(this, _config.LogLevel);
 
-            RequestClient = new RequestClient(this, _config, _serializer);
+            RequestClient = new RequestClient(this, _config, _serializer, _logger);
         }
 
         public async Task ConnectAsync()
@@ -37,7 +40,7 @@ namespace Pusharp
             var authentication = await RequestClient.SendAsync<CurrentUserModel>("/v2/users/me", HttpMethod.Get, null).ConfigureAwait(false);
             CurrentUser = new CurrentUser(authentication, RequestClient);
 
-            var socket = new WebSocket(this, _config, _serializer);
+            var socket = new WebSocket(this, _config, _serializer, _logger);
             socket.Connect();
         }
     }

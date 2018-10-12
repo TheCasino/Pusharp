@@ -1,3 +1,5 @@
+using System;
+
 namespace Pusharp.Utilities
 {
     public class LogMessage
@@ -15,7 +17,11 @@ namespace Pusharp.Utilities
 
         public override string ToString()
         {
-            return $"{Level:G}: {Message}";
+            var time = DateTime.UtcNow;
+            var niceTime = $"{(time.Hour < 10 ? "0" : "")}{time.Hour}:{(time.Minute < 10 ? "0" : "")}{time.Minute}" +
+                           $":{(time.Second < 10 ? "0" : "")}{time.Second}";
+
+            return $"[{niceTime}] [{Level, -8}] {Message}";
         }
     }
 }
