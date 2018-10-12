@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Pusharp.RequestParameters;
 using Model = Pusharp.Models.ChannelModel;
 
 namespace Pusharp.Entities
@@ -6,6 +8,7 @@ namespace Pusharp.Entities
     public class Channel
     {
         private readonly Model _model;
+        private readonly PushBulletClient _client;
 
         public string Identifier => _model.Identifier;
         public string Tag => _model.Tag;
@@ -18,9 +21,34 @@ namespace Pusharp.Entities
         private Uri _websiteUrl;
         public Uri WebsiteUrl => _websiteUrl ?? (_websiteUrl = new Uri(_model.WebsiteUrl));
 
-        internal Channel(Model model)
+        internal Channel(Model model, PushBulletClient client)
         {
             _model = model;
+            _client = client;
+        }
+
+        public Task<Push> SendNoteAsync(Action<NotePushParameters> parameterOperator)
+        {
+            var parameters = new NotePushParameters();
+            parameterOperator(parameters);
+
+            return _client.PushNoteAsync(parameters, PushTarget.Channel, Tag);
+        }
+
+        public Task<Push> SendLinkAsync(Action<LinkPushParameters> parameterOperator)
+        {
+            var parameters = new LinkPushParameters();
+            parameterOperator(parameters);
+
+            return _client.PushLinkAsync(parameters, PushTarget.Channel, Tag);
+        }
+
+        public Task<Push> SendFileAsync(Action<FilePushParameters> parameterOperator)
+        {
+            var parameters = new FilePushParameters();
+            parameterOperator(parameters);
+
+            return _client.PushFileAsync(parameters, PushTarget.Channel, Tag);
         }
     }
 }

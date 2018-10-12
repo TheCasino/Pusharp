@@ -1,37 +1,27 @@
 ﻿using Pusharp.Utilities;
+using System;
 using Voltaic.Serialization;
 using Voltaic.Serialization.Json;
 
 namespace Pusharp.RequestParameters
 {
-    public class DevicePushParameters : ParametersBase
+    public class LinkPushParameters : BasePush
     {
         [ModelProperty("type")]
-        internal string InternalType => Type.ToString().ToLower();
+        internal override string Type { get; set; }
 
-        public PushType Type { get; set; }
+        [ModelProperty("body")]
+        public override string Body { get; set; }
 
         [ModelProperty("title")]
         public string Title { get; set; }
 
-        [ModelProperty("body")]
-        public string Body { get; set; }
-
         [ModelProperty("url")]
         public string Url { get; set; }
 
-        [ModelProperty("file_name")]
-        public string FileName { get; set; }
-
-        [ModelProperty("file_type")]
-        public string FileType { get; set; }
-
-        [ModelProperty("file_url")]
-        public string FileUrl { get; set; }
-
         internal override void VerifyParameters(ParameterBuilder builder)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         internal override string BuildContent(JsonSerializer serializer)

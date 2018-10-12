@@ -10,7 +10,7 @@ namespace Pusharp.RequestParameters
         public string Type { get; set; } = "push";
 
         [ModelProperty("push")]
-        public Push Push { get; set; }
+        public SmsPush Push { get; set; }
 
         internal override void VerifyParameters(ParameterBuilder builder)
         {
@@ -26,7 +26,7 @@ namespace Pusharp.RequestParameters
         }
     }
 
-    public class Push
+    public class SmsPush
     {
         [ModelProperty("conversation_iden")]
         public string ConversationIdentifier { get; set; }

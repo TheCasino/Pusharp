@@ -10,7 +10,7 @@ namespace Pusharp.Entities
     public class Subscription
     {
         private Model _model;
-        private readonly RequestClient _client;
+        private readonly PushBulletClient _client;
 
         public string Identifier => _model.Identifier;
 
@@ -21,9 +21,9 @@ namespace Pusharp.Entities
         public DateTimeOffset Modified => DateTimeHelpers.ToDateTime(_model.Modified);
 
         private Channel _channel;
-        public Channel Channel => _channel ?? (_channel = new Channel(_model.Channel));
+        public Channel Channel => _channel ?? (_channel = new Channel(_model.Channel, _client));
 
-        internal Subscription(Model model, RequestClient client)
+        internal Subscription(Model model, PushBulletClient client)
         {
             _client = client;
             _model = model;
@@ -31,7 +31,7 @@ namespace Pusharp.Entities
 
         public async Task ModifyAsync(bool isMuted)
         {
-            var model = await _client
+            var model = await _client.RequestClient
                 .SendAsync<Model>($"/v2/subscriptions/{Identifier}", HttpMethod.Post, new MutedParameter
                 {
                     IsMuted = isMuted
@@ -42,7 +42,8 @@ namespace Pusharp.Entities
 
         public async Task DeleteAsync()
         {
-            await _client.SendAsync($"/v2/subscriptions/{Identifier}", HttpMethod.Delete, null)
+            await _client.RequestClient
+                .SendAsync($"/v2/subscriptions/{Identifier}", HttpMethod.Delete, null)
                 .ConfigureAwait(false);
         }
     }

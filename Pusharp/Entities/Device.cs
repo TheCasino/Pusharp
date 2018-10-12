@@ -80,17 +80,28 @@ namespace Pusharp.Entities
             _model = model;
         }
 
-        public async Task<Push> SendPushAsync(DevicePushParameters parameters)
+        public Task<Push> SendNoteAsync(Action<NotePushParameters> parameterOperator)
         {
-            //kinda hacky... Can't think of a better way to do it though
-            //TODO doesn't work think of a better way to do this
-            var serialized = parameters.BuildContent(_serializer);
-            var pushParameters = _serializer.ReadUtf8<PushParameters>(new Utf8String(serialized));
-            pushParameters.DeviceIdentifier = Identifier;
+            var parameters = new NotePushParameters();
+            parameterOperator(parameters);
 
-            var push = await _client.SendPushAsync(pushParameters).ConfigureAwait(false);
+            return _client.PushNoteAsync(parameters, PushTarget.Device, Identifier);
+        }
 
-            return push;
+        public Task<Push> SendFileAsync(Action<FilePushParameters> parameterOperator)
+        {
+            var parameters = new FilePushParameters();
+            parameterOperator(parameters);
+
+            return _client.PushFileAsync(parameters, PushTarget.Device, Identifier);
+        }
+
+        public Task<Push> SendLinkAsync(Action<LinkPushParameters> parameterOperator)
+        {
+            var parameters = new LinkPushParameters();
+            parameterOperator(parameters);
+
+            return _client.PushLinkAsync(parameters, PushTarget.Device, Identifier);
         }
     }
 }

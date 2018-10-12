@@ -17,7 +17,7 @@ namespace Pusharp
                 .SendAsync<SubscriptionsModel>("/v2/subscriptions", HttpMethod.Get, null)
                 .ConfigureAwait(false);
 
-            var subscriptions = subscriptionsModel.Subscriptions.Select(x => new Subscription(x, RequestClient));
+            var subscriptions = subscriptionsModel.Subscriptions.Select(x => new Subscription(x, this));
 
             return subscriptions.ToImmutableList();
         }
@@ -28,7 +28,7 @@ namespace Pusharp
                 .SendAsync<SubscriptionModel>("/v2/subscriptions", HttpMethod.Post, parameters)
                 .ConfigureAwait(false);
 
-            return new Subscription(subscriptionModel, RequestClient);
+            return new Subscription(subscriptionModel, this);
         }
 
         public async Task<ChannelInfo> GetChannelInfoAsync(ChannelInfoParameters parameters)
