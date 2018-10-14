@@ -55,6 +55,8 @@ namespace Pusharp.Entities
         public bool IsDismissed => _model.IsDismissed;
 
         public DateTimeOffset Created => DateTimeHelpers.ToDateTime(_model.Created);
+        public DateTimeOffset Modified => DateTimeHelpers.ToDateTime(_model.Modified);
+        internal double InternalModified => _model.Modified;
 
         private File _file;
         public File File => _file ?? (_file = new File(_model.FileName, _model.FileType, _model.FileUrl));

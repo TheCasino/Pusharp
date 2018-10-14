@@ -3,8 +3,6 @@ using Pusharp.Utilities;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Voltaic;
-using Voltaic.Serialization.Json;
 using Model = Pusharp.Models.DeviceModel;
 
 namespace Pusharp.Entities
@@ -12,13 +10,11 @@ namespace Pusharp.Entities
     public class Device
     {
         private Model _model;
-        private readonly JsonSerializer _serializer;
         private readonly PushBulletClient _client;
 
-        internal Device(Model model, JsonSerializer serializer, PushBulletClient client)
+        internal Device(Model model, PushBulletClient client)
         {
             _model = model;
-            _serializer = serializer;
             _client = client;
         }
 
@@ -45,6 +41,8 @@ namespace Pusharp.Entities
         public string Icon => _model.Icon;
         public string RemoteFiles => _model.RemoteFiles;
 
+        internal double InternalModified => _model.Modified;
+
         /// <summary>
         ///     Updates this device's properties, returning a mutated form of this device.
         /// </summary>
@@ -54,10 +52,8 @@ namespace Pusharp.Entities
             var parameters = new DeviceParameters();
             parameterOperator(parameters);
 
-            var result = await _client.RequestClient.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Post, parameters)
+            await _client.RequestClient.SendAsync<Model>($"/v2/devices/{Identifier}", HttpMethod.Post, parameters)
                 .ConfigureAwait(false);
-
-            _model = result;
         }
 
         /// <summary>
@@ -74,10 +70,8 @@ namespace Pusharp.Entities
                 return;
             }
 
-            var model = await _client.RequestClient.SendAsync<Model>($"/devices/{Identifier}", HttpMethod.Delete, null)
+            await _client.RequestClient.SendAsync<Model>($"/v2/devices/{Identifier}", HttpMethod.Delete, null)
                 .ConfigureAwait(false);
-
-            _model = model;
         }
 
         public Task<Push> SendNoteAsync(Action<NotePushParameters> parameterOperator)

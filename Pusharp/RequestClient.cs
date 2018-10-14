@@ -27,13 +27,12 @@ namespace Pusharp
         private readonly SemaphoreSlim _semaphore;
         private readonly JsonSerializer _serializer;
         private readonly PushBulletClient _client;
-        private readonly Logger _logger;
 
         private string _rateLimit;
         private string _rateLimitReset;
         private string _remaining;
 
-        public RequestClient(PushBulletClient client, PushBulletClientConfig config, JsonSerializer serializer, Logger logger)
+        public RequestClient(PushBulletClient client, PushBulletClientConfig config, JsonSerializer serializer)
         {
             _client = client;
 
@@ -46,7 +45,6 @@ namespace Pusharp
             _http.DefaultRequestHeaders.Add("Access-Token", config.Token);
 
             _serializer = serializer;
-            _logger = logger;
             _semaphore = new SemaphoreSlim(1, 1);
         }
 
@@ -83,7 +81,7 @@ namespace Pusharp
                 {
                     requestTime.Stop();
 
-                    _logger.InvokeLog(new LogMessage(LogLevel.Verbose, $"{method} {endpoint}: {requestTime.ElapsedMilliseconds}ms"));
+                    await _client.InternalLogAsync(new LogMessage(LogLevel.Verbose, $"{method} {endpoint}: {requestTime.ElapsedMilliseconds}ms"));
 
                     ParseResponseHeaders(response);
 
@@ -92,7 +90,7 @@ namespace Pusharp
             }
             catch (Exception exception)
             {
-                _logger.InvokeLog(new LogMessage(LogLevel.Error, exception.ToString()));
+                await _client.InternalLogAsync(new LogMessage(LogLevel.Error, exception.ToString()));
                 return default;
             }
         }

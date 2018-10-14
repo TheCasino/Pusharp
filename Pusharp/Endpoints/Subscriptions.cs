@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Pusharp.Entities;
+using Pusharp.Models;
+using Pusharp.RequestParameters;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Pusharp.Entities;
-using Pusharp.Models;
-using Pusharp.RequestParameters;
 
 namespace Pusharp
 {
@@ -23,25 +22,19 @@ namespace Pusharp
             return subscriptions.ToImmutableList();
         }
 
-        public async Task<Subscription> CreateSubscriptionAsync(Action<SubscriptionParameters> subscriptionParameters)
+        public async Task<Subscription> CreateSubscriptionAsync(SubscriptionParameters subscriptionParameters)
         {
-            var parameters = new SubscriptionParameters();
-            subscriptionParameters(parameters);
-
             var subscriptionModel = await RequestClient
-                .SendAsync<SubscriptionModel>("/v2/subscriptions", HttpMethod.Post, parameters)
+                .SendAsync<SubscriptionModel>("/v2/subscriptions", HttpMethod.Post, subscriptionParameters)
                 .ConfigureAwait(false);
 
             return new Subscription(subscriptionModel, this);
         }
 
-        public async Task<ChannelInfo> GetChannelInfoAsync(Action<ChannelInfoParameters> channelInfoParameters)
+        public async Task<ChannelInfo> GetChannelInfoAsync(ChannelInfoParameters channelInfoParameters)
         {
-            var parameters = new ChannelInfoParameters();
-            channelInfoParameters(parameters);
-
             var channelInfoModel = await RequestClient
-                .SendAsync<ChannelInfoModel>("/v2/channel-info", HttpMethod.Get, parameters)
+                .SendAsync<ChannelInfoModel>("/v2/channel-info", HttpMethod.Get, channelInfoParameters)
                 .ConfigureAwait(false);
 
             return new ChannelInfo(channelInfoModel, RequestClient);

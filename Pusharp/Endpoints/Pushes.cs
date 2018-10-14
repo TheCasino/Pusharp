@@ -12,12 +12,9 @@ namespace Pusharp
 {
     public partial class PushBulletClient
     {
-        public async Task<IReadOnlyCollection<Push>> GetPushesAsync(Action<PushFilterParameters> pushFilterParameters)
+        public async Task<IReadOnlyCollection<Push>> GetPushesAsync(PushFilterParameters pushFilterParameters)
         {
-            var parameters = new PushFilterParameters();
-            pushFilterParameters(parameters);
-
-            var pushesModel = await RequestClient.SendAsync<PushesModel>("/v2/pushes", HttpMethod.Get, parameters)
+            var pushesModel = await RequestClient.SendAsync<PushesModel>("/v2/pushes", HttpMethod.Get, pushFilterParameters)
                 .ConfigureAwait(false);
             
             var pushes = pushesModel.Pushes.Select(x => new Push(x, RequestClient));
@@ -25,28 +22,30 @@ namespace Pusharp
             return pushes.ToImmutableList();
         }
 
-        public Task<Push> EmailNoteAsync(Action<NotePushParameters> notePushParameters, string email)
+        internal async Task<IReadOnlyCollection<PushModel>> InternalGetPushesAsync(Action<PushFilterParameters> pushFilterParameters, double after)
         {
-            var parameters = new NotePushParameters();
-            notePushParameters(parameters);
+            var parameters = new PushFilterParameters();
+            pushFilterParameters(parameters);
 
-            return PushNoteAsync(parameters, PushTarget.Email, email);
+            var pushesModel = await RequestClient.SendAsync<PushesModel>($"/v2/pushes?modified_after={after}", HttpMethod.Get, parameters)
+                .ConfigureAwait(false);
+
+            return pushesModel.Pushes;
         }
 
-        public Task<Push> EmailLinkAsync(Action<LinkPushParameters> linkPushParameters, string email)
+        public Task<Push> EmailNoteAsync(NotePushParameters notePushParameters, string email)
         {
-            var parameters = new LinkPushParameters();
-            linkPushParameters(parameters);
-
-            return PushLinkAsync(parameters, PushTarget.Email, email);
+            return PushNoteAsync(notePushParameters, PushTarget.Email, email);
         }
 
-        public Task<Push> EmailFileAsync(Action<FilePushParameters> filePushParameters, string email)
+        public Task<Push> EmailLinkAsync(LinkPushParameters linkPushParameters, string email)
         {
-            var parameters = new FilePushParameters();
-            filePushParameters(parameters);
+            return PushLinkAsync(linkPushParameters, PushTarget.Email, email);
+        }
 
-            return PushFileAsync(parameters, PushTarget.Email, email);
+        public Task<Push> EmailFileAsync(FilePushParameters filePushParameters, string email)
+        {
+            return PushFileAsync(filePushParameters, PushTarget.Email, email);
         }
 
         internal Task<Push> PushNoteAsync(NotePushParameters parameters, PushTarget target, string identifier)
