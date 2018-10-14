@@ -1,6 +1,7 @@
 ﻿using Pusharp.Utilities;
 using System;
 using System.Threading.Tasks;
+using Pusharp.Entities;
 using Pusharp.Entities.WebSocket;
 
 namespace Pusharp
@@ -11,28 +12,52 @@ namespace Pusharp
 
         internal Task InternalLogAsync(LogMessage message)
         {
-            return Log is null ? Task.CompletedTask : Log.Invoke(message);
+            if (message.Level >= _config.LogLevel)
+                return Log is null ? Task.CompletedTask : Log.Invoke(message);
+
+            return Task.CompletedTask;
         }
 
         public event Func<ReceivedPush, Task> PushReceived;
 
-        internal void InternalPushReceivedAsync(ReceivedPush push)
+        internal Task InternalPushReceivedAsync(ReceivedPush push)
         {
-            PushReceived?.Invoke(push);
+            return PushReceived is null ? Task.CompletedTask : PushReceived.Invoke(push);
         }
 
         public event Func<DismissedPush, Task> PushDismissed;
 
-        internal void InternalPushDismissedAsync(DismissedPush push)
+        internal Task InternalPushDismissedAsync(DismissedPush push)
         {
-            PushDismissed?.Invoke(push);
+            return PushDismissed is null ? Task.CompletedTask : PushDismissed.Invoke(push);
         }
 
         public event Func<ReceivedCopy, Task> CopyReceived;
 
-        internal void InternalCopyReceivedAsync(ReceivedCopy copy)
+        internal Task InternalCopyReceivedAsync(ReceivedCopy copy)
         {
-            CopyReceived?.Invoke(copy);
+            return CopyReceived is null ? Task.CompletedTask : CopyReceived.Invoke(copy);
+        }
+
+        public event Func<Task> Ready;
+
+        private Task InternalReadyAsync()
+        {
+            return Ready is null ? Task.CompletedTask : Ready.Invoke();
+        }
+
+        public event Func<Device, Device, Task> DeviceUpdated;
+
+        internal Task InternalDeviceUpdatedAsync(Device before, Device after)
+        {
+            return DeviceUpdated is null ? Task.CompletedTask : DeviceUpdated.Invoke(before, after);
+        }
+
+        public event Func<Push, Push, Task> PushUpdated;
+
+        internal Task InternalPushUpdatedAsync(Push before, Push after)
+        {
+            return PushUpdated is null ? Task.CompletedTask : PushUpdated(before, after);
         }
     }
 }
