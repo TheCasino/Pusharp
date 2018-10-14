@@ -13,6 +13,9 @@ namespace Pusharp.Models
         [ModelProperty("created")]
         public double Created { get; set; }
 
+        [ModelProperty("modified")]
+        public double Modified { get; set; }
+
         [ModelProperty("type")]
         public string Type { get; set; }
 
