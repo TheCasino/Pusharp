@@ -1,4 +1,4 @@
-using Pusharp.Entities.WebSocket;
+﻿using Pusharp.Entities.WebSocket;
 using Pusharp.Models.WebSocket;
 using System;
 using System.Net.WebSockets;
@@ -34,11 +34,11 @@ namespace Pusharp
             }
             catch (AggregateException exception)
             {
-                await _client.InternalLogAsync(new LogMessage(LogLevel.Critical, exception.ToString()));
+                await _client.InternalLogAsync(new ExceptionMessage(LogLevel.Critical, exception));
             }
             catch (WebSocketException exception)
             {
-                await _client.InternalLogAsync(new LogMessage(LogLevel.Critical, exception.ToString()));
+                await _client.InternalLogAsync(new ExceptionMessage(LogLevel.Critical, exception));
             }
         }
 

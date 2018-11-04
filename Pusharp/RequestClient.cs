@@ -1,8 +1,6 @@
 using Pusharp.Models;
 using Pusharp.RequestParameters;
-using Pusharp.Utilities;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -90,7 +88,7 @@ namespace Pusharp
             }
             catch (Exception exception)
             {
-                await _client.InternalLogAsync(new LogMessage(LogLevel.Error, exception.ToString()));
+                await _client.InternalLogAsync(new ExceptionMessage(LogLevel.Critical, exception));
                 return default;
             }
         }
@@ -119,8 +117,10 @@ namespace Pusharp
                 //ratelimited
                 case (HttpStatusCode)429:
                     _semaphore.Release();
-                    await _client.InternalLogAsync(new LogMessage(LogLevel.Warning, 
-                        $"You have been ratelimited. Ratelimits resets at {RateLimitReset}"));
+                    await _client.InternalLogAsync(
+                        new RatelimitMessage("You are being ratelimited",
+                            LogLevel.Warning, RateLimit, Remaining,
+                            RateLimitReset));
                     _semaphore.Release();
                     return default;
 
