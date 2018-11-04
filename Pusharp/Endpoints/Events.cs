@@ -1,8 +1,7 @@
-﻿using Pusharp.Utilities;
-using System;
-using System.Threading.Tasks;
 using Pusharp.Entities;
 using Pusharp.Entities.WebSocket;
+using System;
+using System.Threading.Tasks;
 
 namespace Pusharp
 {
