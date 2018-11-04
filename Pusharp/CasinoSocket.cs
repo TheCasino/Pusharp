@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -14,14 +15,10 @@ namespace Pusharp
         private readonly ClientWebSocket _socket;
         private readonly UTF8Encoding _encoder;
 
-        private readonly ConcurrentQueue<IEnumerable<byte>> _bufferQueue;
-
         public CasinoSocket()
         {
             _socket = new ClientWebSocket();
             _encoder = new UTF8Encoding();
-
-            _bufferQueue = new ConcurrentQueue<IEnumerable<byte>>();
         }
 
         public async Task ConnectAsync(string url)
@@ -43,28 +40,32 @@ namespace Pusharp
         {
             while (_socket.State == WebSocketState.Open)
             {
-                var buffer = new byte[1024];
-                var result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-
-                if (result.MessageType == WebSocketMessageType.Text)
+                using (var stream = new MemoryStream())
                 {
-                    var trimmedBuffer = buffer.Take(result.Count);
-                    _bufferQueue.Enqueue(trimmedBuffer);
-
-                    if(result.EndOfMessage)
+                    WebSocketReceiveResult result;
+                    do
                     {
-                        var builder = new StringBuilder();
+                        var buffer = new byte[1024];
+                        result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 
-                        while (_bufferQueue.TryDequeue(out var qBuffer))
+                        switch (result.MessageType)
                         {
-                            builder.Append(_encoder.GetString(qBuffer.ToArray()));
+                            case WebSocketMessageType.Text:
+                                await stream.WriteAsync(buffer, 0, result.Count);
+                                break;
+
+                            default:
+                                break;
                         }
-
-                        await InternalMessageReceived(builder.ToString());
                     }
-                }
+                    while (!result.EndOfMessage);
 
-                await Task.Delay(100);
+                    var bytes = stream.ToArray();
+                    if(bytes.Length <= 0)
+                        break;
+
+                    await InternalMessageReceived(_encoder.GetString(bytes));
+                }                
             }
         }
     }

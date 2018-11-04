@@ -111,35 +111,40 @@ namespace Pusharp
 
             switch (message.StatusCode)
             {
+                //okay result
                 case (HttpStatusCode)200:
-                    break;
+                    _semaphore.Release();
+                    return _serializer.ReadUtf8<T>(new ReadOnlySpan<byte>(result));
 
-                case (HttpStatusCode)400:
-                    //missing parameter
-                    break;
-
-                case (HttpStatusCode)401:
-                    //no valid access token
-                    break;
-
-                case (HttpStatusCode)403:
-                    //access token not valid for context
-                    break;
-
-                case (HttpStatusCode)404:
-                    //requested item does not exist
-                    break;
-
+                //ratelimited
                 case (HttpStatusCode)429:
-                    //ratelimit
-                    break;
+                    _semaphore.Release();
+                    await _client.InternalLogAsync(new LogMessage(LogLevel.Warning, 
+                        $"You have been ratelimited. Ratelimits resets at {RateLimitReset}"));
+                    _semaphore.Release();
+                    return default;
 
+                //leaving these in and not doing default to make it more readable/easier
+                //for me to work with later if I need to change how this is handled
+                //missing parameter
+                case (HttpStatusCode)400:
+                //no valid access token
+                case (HttpStatusCode)401:
+                //access token not valid for context
+                case (HttpStatusCode)403:
+                //requested item does not exist
+                case (HttpStatusCode)404:
+                //5XX internal server error
                 default:
-                    //internal server error
-                    break;
+                    var errorModel = _serializer
+                        .ReadUtf8<ErrorMessageModel>(new ReadOnlySpan<byte>(result));
+
+                    await _client.InternalLogAsync(new LogMessage(LogLevel.Error, 
+                        $"{errorModel.Message}"));
+                    
+                    _semaphore.Release();
+                    return default;
             }
-            _semaphore.Release();
-            return _serializer.ReadUtf8<T>(new ReadOnlySpan<byte>(result));
         }
     }
 }
