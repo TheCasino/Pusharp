@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Pusharp
 {
-    public partial class PushBulletClient
+    public sealed partial class PushBulletClient
     {
         /// <summary>
         ///     Retrieves a list of all devices under the client's account.

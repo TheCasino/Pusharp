@@ -6,7 +6,7 @@ using Model = Pusharp.Models.CurrentUserModel;
 
 namespace Pusharp.Entities
 {
-    public class CurrentUser
+    public sealed class CurrentUser
     {
         private readonly Model _model;
         private readonly RequestClient _client;

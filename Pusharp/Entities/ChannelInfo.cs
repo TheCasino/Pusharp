@@ -6,7 +6,7 @@ using Model = Pusharp.Models.ChannelInfoModel;
 
 namespace Pusharp.Entities
 {
-    public class ChannelInfo
+    public sealed class ChannelInfo
     {
         private readonly Model _model;
         private readonly RequestClient _client;

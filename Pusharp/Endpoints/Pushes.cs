@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Pusharp
 {
-    public partial class PushBulletClient
+    public sealed partial class PushBulletClient
     {
         public async Task<IReadOnlyCollection<Push>> GetPushesAsync(PushFilterParameters pushFilterParameters)
         {

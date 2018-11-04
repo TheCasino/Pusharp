@@ -7,7 +7,7 @@ using Model = Pusharp.Models.DeviceModel;
 
 namespace Pusharp.Entities
 {
-    public class Device
+    public sealed class Device
     {
         private Model _model;
         private readonly PushBulletClient _client;

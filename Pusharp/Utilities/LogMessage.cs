@@ -2,7 +2,7 @@ using System;
 
 namespace Pusharp.Utilities
 {
-    public class LogMessage
+    public sealed class LogMessage
     {
         //TODO LogSource + LogHandler class -> filter logs by level
 

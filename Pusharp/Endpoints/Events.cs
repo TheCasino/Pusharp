@@ -6,7 +6,7 @@ using Pusharp.Entities.WebSocket;
 
 namespace Pusharp
 {
-    public partial class PushBulletClient
+    public sealed partial class PushBulletClient
     {
         public event Func<LogMessage, Task> Log;
 

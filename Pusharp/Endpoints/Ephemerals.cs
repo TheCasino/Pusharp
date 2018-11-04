@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Pusharp
 {
-    public partial class PushBulletClient
+    public sealed partial class PushBulletClient
     {
         /// <summary>
         ///     Sends an SMS message to a device.

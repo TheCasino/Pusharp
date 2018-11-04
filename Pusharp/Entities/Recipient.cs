@@ -3,7 +3,7 @@ using Model = Pusharp.Models.With;
 
 namespace Pusharp.Entities
 {
-    public class Recipient
+    public sealed class Recipient
     {
         private readonly Model _model;
 

@@ -7,7 +7,7 @@ using Model = Pusharp.Models.PushModel;
 
 namespace Pusharp.Entities
 {
-    public class Push
+    public sealed class Push
     {
         private Model _model;
         private readonly RequestClient _client;

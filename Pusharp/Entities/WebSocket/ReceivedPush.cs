@@ -2,7 +2,7 @@
 
 namespace Pusharp.Entities.WebSocket
 {
-    public class ReceivedPush
+    public sealed class ReceivedPush
     {
         private readonly Model _model;
 

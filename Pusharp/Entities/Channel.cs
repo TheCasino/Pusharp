@@ -5,7 +5,7 @@ using Model = Pusharp.Models.ChannelModel;
 
 namespace Pusharp.Entities
 {
-    public class Channel
+    public sealed class Channel
     {
         private readonly Model _model;
         private readonly PushBulletClient _client;

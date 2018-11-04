@@ -15,7 +15,7 @@ namespace Pusharp
     /// <summary>
     ///     The base class for interfacing with the Pushbullet API.
     /// </summary>
-    public partial class PushBulletClient
+    public sealed partial class PushBulletClient
     {
         private readonly PushBulletClientConfig _config;
         private readonly JsonSerializer _serializer;

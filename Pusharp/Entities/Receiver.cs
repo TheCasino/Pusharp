@@ -2,7 +2,7 @@
 
 namespace Pusharp.Entities
 {
-    public class Receiver
+    public sealed class Receiver
     {
         private readonly Model _model;
 

@@ -6,7 +6,7 @@ using Model = Pusharp.Models.UploadRequestModel;
 
 namespace Pusharp.Entities
 {
-    public class UploadRequest
+    public sealed class UploadRequest
     {
         private readonly Model _model;
         private readonly RequestClient _client;

@@ -2,7 +2,7 @@
 
 namespace Pusharp.Entities
 {
-    public class Image
+    public sealed class Image
     {
         public Uri Url { get; }
         public int Width { get; }

@@ -2,7 +2,7 @@
 
 namespace Pusharp.Entities
 {
-    public class File
+    public sealed class File
     {
         public string Name { get; }
         public string Type { get; }

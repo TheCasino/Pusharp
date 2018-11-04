@@ -7,7 +7,7 @@ using Model = Pusharp.Models.ChatModel;
 
 namespace Pusharp.Entities
 {
-    public class Chat
+    public sealed class Chat
     {
         private Model _model;
         private readonly PushBulletClient _client;

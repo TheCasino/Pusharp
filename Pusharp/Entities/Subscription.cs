@@ -7,7 +7,7 @@ using Model = Pusharp.Models.SubscriptionModel;
 
 namespace Pusharp.Entities
 {
-    public class Subscription
+    public sealed class Subscription
     {
         private Model _model;
         private readonly PushBulletClient _client;

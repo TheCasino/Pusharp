@@ -7,7 +7,7 @@ using Pusharp.RequestParameters;
 
 namespace Pusharp
 {
-    public partial class PushBulletClient
+    public sealed partial class PushBulletClient
     {
         public async Task<UploadRequest> CreateUploadRequestAsync(Action<UploadRequestParameters> uploadRequestParameters)
         {
