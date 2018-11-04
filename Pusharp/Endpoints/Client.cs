@@ -35,7 +35,7 @@ namespace Pusharp
 
         public PushBulletClient(PushBulletClientConfig config)
         {
-            if(string.IsNullOrWhiteSpace(config.Token))
+            if (string.IsNullOrWhiteSpace(config.Token))
                 throw new NoNullAllowedException("Token can't be null or empty");
 
             _config = config;
@@ -55,24 +55,30 @@ namespace Pusharp
             var socket = new WebSocket(this, _config, _serializer);
             await socket.ConnectAsync();
 
-            await InternalLogAsync(new LogMessage(LogLevel.Verbose, "Building cache"));
-            var devices = await GetDevicesAsync();
+            if (_config.UseCache)
+            {
+                await InternalLogAsync(new LogMessage(LogLevel.Verbose, "Building cache"));
+                var devices = await GetDevicesAsync();
 
-            foreach (var device in devices)
-                _devices[device.Identifier] = device;
+                foreach (var device in devices)
+                    _devices[device.Identifier] = device;
 
-            var pushes = await GetPushesAsync(null);
+                var pushes = await GetPushesAsync(null);
 
-            foreach (var push in pushes)
-                _pushes[push.Identifier] = push;
+                foreach (var push in pushes)
+                    _pushes[push.Identifier] = push;
 
-            await InternalLogAsync(new LogMessage(LogLevel.Verbose, "Cache built"));
-            
+                await InternalLogAsync(new LogMessage(LogLevel.Verbose, "Cache built"));
+            }
+
             await InternalReadyAsync();
         }
 
         internal async Task UpdateDeviceCacheAsync()
         {
+            if(!_config.UseCache)
+                return;
+
             var ordered = Devices.OrderBy(x => x.Modified);
             var recent = ordered.LastOrDefault();
 
@@ -89,6 +95,9 @@ namespace Pusharp
 
         internal async Task UpdatePushCacheAsync()
         {
+            if(!_config.UseCache)
+                return;
+
             var ordered = Pushes.OrderBy(x => x.Modified);
             var recent = ordered.LastOrDefault();
 
@@ -100,7 +109,7 @@ namespace Pusharp
             foreach (var model in pushModels)
             {
                 _pushes[model.Identifier] = new Push(model, RequestClient);
-            }            
+            }
         }
     }
 }
